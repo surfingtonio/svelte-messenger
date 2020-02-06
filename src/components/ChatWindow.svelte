@@ -36,7 +36,7 @@
 			<div class={chat.user.id === user.id ? 'chat-item you' : 'chat-item'}>
 				<div class="chat">
 					<div class="user">
-						<span class="username">{chat.user.username}</span>
+						<span class="username">{chat.user.id === user.id ? 'You' : chat.user.username}</span>
 					</div>
 					<div class="message">
 						<span class="content">{chat.message.content}</span>
