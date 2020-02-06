@@ -8,7 +8,7 @@
 	};
 	let chats = [];
 
-	const socket = io();
+	const socket = io('/chatrooms');
 	const handleIncomingMessage = (event) => socket.emit('incomingMessage', event.detail);
 
 	socket.on('incomingMessage', chat => chats = [...chats, chat]);
