@@ -3,7 +3,7 @@ const app = express();
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const port = 4000;
+const port = 8080;
 
 app.use(express.static(__dirname + '/public'))
 
@@ -14,6 +14,6 @@ io.on('connection', socket => {
     socket.on('incomingMessage', chat => io.emit('incomingMessage', chat));
 });
 
-server.listen(4000, function(){
+server.listen(port, function(){
     console.log('Server listening on *:' + port);
 });
