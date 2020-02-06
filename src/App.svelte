@@ -8,9 +8,10 @@
 	};
 	let chats = [];
 
-	const handleIncomingMessage = (event) => {
-		chats = [...chats, event.detail];
-	};
+	const socket = io();
+	const handleIncomingMessage = (event) => socket.emit('incomingMessage', event.detail);
+
+	socket.on('incomingMessage', chat => chats = [...chats, chat]);
 </script>
 
 <ChatWindow {user} {chats} on:incomingMessage={handleIncomingMessage} />
