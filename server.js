@@ -14,6 +14,4 @@ io.on('connection', socket => {
     socket.on('incomingMessage', chat => io.emit('incomingMessage', chat));
 });
 
-server.listen(process.env.PORT || port, function(){
-    console.log('Server listening on *:' + port);
-});
+server.listen(process.env.PORT || port, _ => console.log('Server listening on *:' + port));
