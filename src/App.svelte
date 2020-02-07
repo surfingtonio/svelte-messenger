@@ -9,12 +9,17 @@
 	let chats = [];
 
 	const socket = io('/chatrooms');
-	const handleIncomingMessage = (event) => socket.emit('incomingMessage', event.detail);
+	const handleMessageReceive = (event) => socket.emit('messagereceive', event.detail);
 
-	socket.on('incomingMessage', chat => chats = [...chats, chat]);
+	console.log('userregister');
+	socket.emit('userregister', user);
+
+	socket.on('userleave', user => {});
+	socket.on('userjoin', user => {});
+	socket.on('messagereceive', chat => chats = [...chats, chat]);
 </script>
 
-<ChatWindow {user} {chats} on:incomingMessage={handleIncomingMessage} />
+<ChatWindow {user} {chats} on:incomingMessage={handleMessageReceive} />
 
 <style>
 	:global(:root) {
