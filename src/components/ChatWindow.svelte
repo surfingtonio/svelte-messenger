@@ -53,33 +53,19 @@
 </main>
 
 <style>
-	:root {
-		--primary-bg-color: #fff;
-		--primary-color: #101010;
-		--secondary-bg-color: #F5F6F8;
-		--secondary-color: #97A4B2;
-		--line-color: #E4E9F2;
-		--max-width: 100vw;
-		--min-width: 480px;
-		--message-color: #EFEFEF;
-		--message-color-user: #D8EBFF;
-		--scrollbar-thumb-color: rgba(228, 228, 228, .5);
-		--scrollbar-thumb-hover-color: rgba(228, 228, 228, 1);
-	}
-
 	main {
 		align-items: stretch;
 		background-color: var(--primary-bg-color);
-		color:var(--primary-color);
+		color: var(--primary-color);
 		height: 100%;
 	}
 
 	.chat-items {
 		height: calc(100vh - 3rem - 1px - .5rem);
-		overflow-y: scroll;
 		overflow-x: hidden;
-		min-width: var(--min-width);
+		overflow-y: scroll;
 		max-width: var(--max-width);;
+		min-width: var(--min-width);
 		margin: 0 auto;
 	}
 
@@ -98,7 +84,7 @@
 	}
 
 	::-webkit-scrollbar-thumb:hover {
-		background:var(--scrollbar-thumb-hover-color);
+		background: var(--scrollbar-thumb-hover-color);
 		opacity: 1;
 	}
 
