@@ -111,6 +111,10 @@
 		width: calc(var(--chat-item-max-width) - (var(--chat-item-padding-x) * 2));
 	}
 
+	.chat-item .chat {
+		max-width: 45%;
+	}
+
 	.chat-item.you .chat .user {
 		text-align: right;
 	}
@@ -126,6 +130,7 @@
 		justify-content: space-between;
 		max-width: var(--messsage-max-width);
 		padding: var(--message-padding-y) var(--message-padding-x);
+		word-break: break-word;
 	}
 
 	.you {
@@ -183,6 +188,6 @@
 		font-style: italic;
 		left: var(--chat-controls-padding-x);
 		padding: var(--chat-controls-padding-x) calc(var(--chat-controls-padding-x) * 2);
-		position: absolute
+		position: absolute;
 	}
 </style>
