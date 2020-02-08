@@ -49,24 +49,27 @@
 		fetch('https://uinames.com/api/?minlen=4&region=canada')
 		.then(res => {
 			loading = false;
-			res.json()
-			.then(user => {
-				user = {
-					id: new Date().getTime(),
-					username: `${user.name} ${user.surname}`,
-					avatar: `./images/avatar-${user.gender}.png`
-				}
-				socket.emit('userregister', user);
-			})
-			.catch(err => {
+			if(res.ok) {
+				res.json()
+				.then(data => {
+					user = {
+						id: new Date().getTime(),
+						username: `${data.name} ${data.surname}`,
+						avatar: `./images/avatar-${data.gender}.png`
+					}
+					socket.emit('userregister', user);
+				})
+				.catch(err => console.error(err));
+			} else {
 				user = {
 					id: new Date().getTime(),
 					username: `John Doe`,
 					avatar: `./images/avatar-male.png`
-				}
+				};
 				socket.emit('userregister', user);
-			});
-		});
+			}
+		})
+		.catch(err => console.error(err));
 	});
 </script>
 
