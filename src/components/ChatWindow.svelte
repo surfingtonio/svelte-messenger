@@ -54,10 +54,10 @@
 				</div>
 			</div>
 		{/each}
-		{#if keyboardActivity}
-			<span class="keyboard-activity">Someone is typing...</span>
-		{/if}
 	</div>
+	{#if keyboardActivity}
+		<span class="keyboard-activity">Someone is typing...</span>
+	{/if}
 	<form class="chat-controls">
 		<input type="text" class="chat-input" placeholder="Type a message..." bind:this={chatInput} on:keydown={handleKeydown} />
 		<button type="submit" on:click|preventDefault="{handleSendMessage}">Send</button>
@@ -155,8 +155,8 @@
 		display: flex;
 		height: var(--chat-controls-height);
 		margin: 0 auto;
-		width: calc(100% - (var(--chat-controls-padding-x) * 2));
 		padding: var(--chat-controls-padding-y) var(--chat-controls-padding-x);
+		width: calc(100% - (var(--chat-controls-padding-x) * 2));
 	}
 
 	.chat-controls .chat-input {
@@ -182,12 +182,15 @@
 	.keyboard-activity {
 		background: var(--component-secondary-background);
 		border-radius: var(--component-border-radius);
+		bottom: var(--chat-controls-outer-height);
 		bottom: var(--chat-controls-padding-y);
-		color: var(--component-secondary-color);
+		color: var(--component-primary-color);
 		font-size: var(--component-small-font);
 		font-style: italic;
 		left: var(--chat-controls-padding-x);
 		padding: var(--chat-controls-padding-x) calc(var(--chat-controls-padding-x) * 2);
-		position: absolute;
+		position: fixed;
+		bottom: calc(var(--chat-controls-outer-height) + var(--chat-controls-padding-x));
+		opacity: .75;
 	}
 </style>
