@@ -21,7 +21,9 @@ nsp.on('connection', socket => {
 
     socket.on('userregister', user => {
         users[socket.id] = user;
-        nsp.emit('userjoin', user);
+
+        nsp.emit('userjoin', {user, users});
+
         console.log(`${user.username} joined. There are ${Object.keys(users).length} user(s) in the room.`);
     });
 

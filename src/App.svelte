@@ -1,28 +1,47 @@
 <script>
 	import io from 'socket.io-client';
 	import ChatWindow from './components/ChatWindow.svelte';
+	import ChatToolbar from './components/ChatToolbar.svelte';
 
 	let user = {
 		id: new Date().getTime(),
 		username: 'User' + new Date().getTime()
 	};
+	let usersCount;
 	let chats = [];
 
 	const socket = io('/chatrooms');
 	const handleMessageReceive = (event) => socket.emit('messagereceive', event.detail);
 
-	console.log('userregister');
 	socket.emit('userregister', user);
 
-	socket.on('userleave', user => {});
-	socket.on('userjoin', user => {});
+	socket.on('userleave', user => {
+		usersCount--;
+	});
+
+	socket.on('userjoin', data => {
+		usersCount = Object.keys(data.users).length;
+	});
+
 	socket.on('messagereceive', chat => chats = [...chats, chat]);
 </script>
 
-<ChatWindow {user} {chats} on:incomingMessage={handleMessageReceive} />
+<div class="container">
+	<div class="chat-toolbar-wrapper">
+		<ChatToolbar {user} {usersCount} />
+	</div>
+	<div class="chat-window-wrapper">
+		<ChatWindow {user} {chats} on:incomingMessage={handleMessageReceive} />
+	</div>
+</div>
 
 <style>
 	:global(:root) {
+		--badge-background: #7360f2;
+		--badge-padding-x: .75rem;
+		--badge-padding-y: 0;
+		--badge-span-padding-x: .5rem;
+		--badge-span-padding-y: .25rem;
 		--chat-controls-height: 3rem;
 		--chat-controls-padding-x: .25rem;
 		--chat-controls-padding-y: .25rem;
@@ -33,6 +52,9 @@
 		--chat-item-padding-y: 0;
 		--chat-items-max-width: 100vw;
 		--chat-items-min-width: 480px;
+		--chat-toolbar-height: 3rem;
+		--chat-toolbar-padding-x: 1rem;
+		--chat-toolbar-padding-y: .5rem;
 		--component-border-radius: .25rem;
 		--component-border-width: 1px;
 		--component-line-color: #e4e9f2;
@@ -56,5 +78,17 @@
 		--scrollbar-track-background: transparent;
 		--scrollbar-width: .5rem;
 		--toolbar-separator-width: .25rem;
+	}
+
+	:root {
+		--chat-toolbar-outer-height: calc(var(--chat-toolbar-height) + (var(--chat-toolbar-padding-y) * 2));
+	}
+
+	.chat-toolbar-wrapper {
+		height: var(--chat-toolbar-outer-height);
+	}
+
+	.chat-window-wrapper {
+		height: calc(100vh - var(--chat-toolbar-outer-height));
 	}
 </style>
