@@ -19,7 +19,8 @@
 				message: {
 					content,
 					time: new Date() },
-				user });
+				user
+			});
 		}
 	}
 

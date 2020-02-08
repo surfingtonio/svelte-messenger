@@ -1,29 +1,50 @@
 <script>
+	import { onMount } from 'svelte';
 	import io from 'socket.io-client';
 	import ChatWindow from './components/ChatWindow.svelte';
 	import ChatToolbar from './components/ChatToolbar.svelte';
 
-	let user = {
-		id: new Date().getTime(),
-		username: 'User' + new Date().getTime()
-	};
+	let user = {};
 	let usersCount;
 	let chats = [];
+	let loading = true;
 
 	const socket = io('/chatrooms');
 	const handleMessageReceive = (event) => socket.emit('messagereceive', event.detail);
-
-	socket.emit('userregister', user);
 
 	socket.on('userleave', user => {
 		usersCount--;
 	});
 
-	socket.on('userjoin', data => {
-		usersCount = Object.keys(data.users).length;
-	});
+	socket.on('userregister', registeredUser => user = registeredUser);
+
+	socket.on('userjoin', data => usersCount = Object.keys(data.users).length);
 
 	socket.on('messagereceive', chat => chats = [...chats, chat]);
+
+	onMount(() => {
+		fetch('https://uinames.com/api/?minlen=4&region=canada')
+		.then(res => {
+			loading = false;
+			res.json()
+			.then(user => {
+				user = {
+					id: new Date().getTime(),
+					username: `${user.name} ${user.surname}`,
+					avatar: `./images/avatar-${user.gender}.png`
+				}
+				socket.emit('userregister', user);
+			})
+			.catch(err => {
+				user = {
+					id: new Date().getTime(),
+					username: `Marc Danting`,
+					avatar: `./images/avatar-male.png`
+				}
+				socket.emit('userregister', user);
+			});
+		});
+	});
 </script>
 
 <div class="container">

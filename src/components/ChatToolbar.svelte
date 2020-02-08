@@ -5,7 +5,7 @@
 
 <div class="chat-toolbar">
     <div class="user">
-        <img src="./images/avataaars-1.png" alt="" class="avatar" />
+        <img src="{user.avatar}" alt="" class="avatar" />
         <span class="username">{user.username}</span>
     </div>
     <div class="badge">Online users <span>{usersCount}</span></div>
@@ -13,10 +13,10 @@
 
 <style>
     .chat-toolbar {
-		display: flex;
-		justify-content: space-between;
-		background: var(--component-secondary-background);
-		line-height: calc(var(--chat-toolbar-height) - (var(--chat-toolbar-padding-y) * 2));
+        background: var(--component-secondary-background);
+        display: flex;
+        justify-content: space-between;
+        line-height: calc(var(--chat-toolbar-height) - (var(--chat-toolbar-padding-y) * 2));
         padding: var(--chat-toolbar-padding-y) var(--chat-toolbar-padding-x);
     }
 
