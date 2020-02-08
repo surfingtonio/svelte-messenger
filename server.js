@@ -10,7 +10,6 @@ app.use(express.static(__dirname + '/public'))
 app.use('/css/fontawesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free'));
 
 nsp.on('connection', socket => {
-
     socket.on('disconnect', () => {
         let user = users[socket.id];
 
@@ -30,6 +29,10 @@ nsp.on('connection', socket => {
     });
 
     socket.on('messagereceive', chat => nsp.emit('messagereceive', chat));
+
+    socket.on('keyboardActivity', user => {
+        socket.broadcast.emit('keyboardActivity', []);
+    });
 });
 
-server.listen(process.env.PORT || port, _ => console.log('Server listening on *:' + port));
+server.listen(process.env.PORT || port, () => console.log('Server listening on *:' + port));

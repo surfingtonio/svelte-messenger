@@ -9,9 +9,26 @@
 	let usersCount;
 	let chats = [];
 	let loading = true;
+	let timeout;
+	let keyboardActivity = false;
 
 	const socket = io('/chatrooms');
-	const handleMessageReceive = (event) => socket.emit('messagereceive', event.detail);
+
+	function handleMessageReceive(event) {
+		socket.emit('messagereceive', event.detail);
+	}
+
+	function handlekeyboardActivity(event) {
+		socket.emit('keyboardActivity', user);
+	}
+
+	$: if(keyboardActivity) {
+		if(timeout) {
+			clearTimeout(timeout);
+		}
+
+		timeout = setTimeout(() => keyboardActivity = false, 2000);
+	}
 
 	socket.on('userleave', user => {
 		usersCount--;
@@ -22,6 +39,8 @@
 	socket.on('userjoin', data => usersCount = Object.keys(data.users).length);
 
 	socket.on('messagereceive', chat => chats = [...chats, chat]);
+
+	socket.on('keyboardActivity', users => keyboardActivity = true);
 
 	onMount(() => {
 		fetch('https://uinames.com/api/?minlen=4&region=canada')
@@ -39,7 +58,7 @@
 			.catch(err => {
 				user = {
 					id: new Date().getTime(),
-					username: `Marc Danting`,
+					username: `John Doe`,
 					avatar: `./images/avatar-male.png`
 				}
 				socket.emit('userregister', user);
@@ -56,7 +75,7 @@
 			<ChatToolbar {user} {usersCount} />
 		</div>
 		<div class="chat-window-wrapper">
-			<ChatWindow {user} {chats} on:incomingMessage={handleMessageReceive} />
+			<ChatWindow {user} {chats} {keyboardActivity} on:incomingMessage={handleMessageReceive} on:keyboardActivity={handlekeyboardActivity} />
 		</div>
 	{/if}
 </div>

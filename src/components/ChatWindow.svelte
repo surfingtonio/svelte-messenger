@@ -4,6 +4,7 @@
 
 	export let user;
 	export let chats = [];
+	export let keyboardActivity = true;
 
 	let chatWindow;
 	let chatInput;
@@ -21,6 +22,12 @@
 					time: new Date() },
 				user
 			});
+		}
+	}
+
+	function handleKeydown(event) {
+		if(event.keyCode !== 13) {
+			dispatch('keyboardActivity', user);
 		}
 	}
 
@@ -47,9 +54,12 @@
 				</div>
 			</div>
 		{/each}
+		{#if keyboardActivity}
+			<span class="keyboard-activity">Someone is typing...</span>
+		{/if}
 	</div>
 	<form class="chat-controls">
-		<input type="text" class="chat-input" placeholder="Type a message..." bind:this={chatInput} />
+		<input type="text" class="chat-input" placeholder="Type a message..." bind:this={chatInput} on:keydown={handleKeydown} />
 		<button type="submit" on:click|preventDefault="{handleSendMessage}">Send</button>
 	</form>
 </main>
@@ -72,6 +82,7 @@
 		max-width: var(--chat-items-max-width);
 		overflow-x: hidden;
 		overflow-y: scroll;
+		position: relative;
 	}
 
 	::-webkit-scrollbar {
@@ -161,5 +172,17 @@
 		color: var(--component-primary-color);
 		cursor: pointer;
 		padding: 0 1rem;
+	}
+
+	.keyboard-activity {
+		background: var(--component-secondary-background);
+		border-radius: var(--component-border-radius);
+		bottom: var(--chat-controls-padding-y);
+		color: var(--component-secondary-color);
+		font-size: var(--component-small-font);
+		font-style: italic;
+		left: var(--chat-controls-padding-x);
+		padding: var(--chat-controls-padding-x) calc(var(--chat-controls-padding-x) * 2);
+		position: absolute
 	}
 </style>
