@@ -38,7 +38,10 @@
 
 	socket.on('userjoin', data => usersCount = Object.keys(data.users).length);
 
-	socket.on('messagereceive', chat => chats = [...chats, chat]);
+	socket.on('messagereceive', chat => {
+		new Audio('./sounds/pling.mp3').play();
+		chats = [...chats, chat];
+	});
 
 	socket.on('keyboardActivity', users => keyboardActivity = true);
 
