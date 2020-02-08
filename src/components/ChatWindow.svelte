@@ -2,25 +2,26 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import moment from 'moment';
 
-    export let user;
+	export let user;
 	export let chats = [];
-	
-    let chatWindow;
+
+	let chatWindow;
 	let chatInput;
-	
+
 	const dispatch = createEventDispatcher();
 
-	const handleSendMessage = () => {
+	function handleSendMessage() {
 		let content = chatInput.value.trim();
 		chatInput.value = '';
-		if(content === '') return;
 
-		dispatch('incomingMessage', { 
-			message: { 
-				content, 
-				time: new Date() }, 
-			user });
-	};
+		if(content !== '') {
+			dispatch('incomingMessage', {
+				message: {
+					content,
+					time: new Date() },
+				user });
+		}
+	}
 
 	onMount(() => {
 		var observer = new MutationObserver(mutations => {
@@ -53,33 +54,37 @@
 </main>
 
 <style>
+	:root {
+		--chat-controls-outer-height: calc(var(--chat-controls-height) + var(--component-border-width) + (var(--chat-controls-padding-y) * 2));
+	}
+
 	main {
 		align-items: stretch;
-		background-color: var(--primary-bg-color);
-		color: var(--primary-color);
-		height: 100%;
+		background: var(--component-primary-background);
+		color: var(--component-primary-color);
+		height: var(--component-max-height);
 	}
 
 	.chat-items {
-		height: calc(100vh - 3rem - 1px - .5rem);
+		height: calc(var(--component-max-height) - var(--chat-controls-outer-height));
+		margin: 0 auto;
+		max-width: var(--chat-items-max-width);
+		min-width: var(--chat-items-min-width);
 		overflow-x: hidden;
 		overflow-y: scroll;
-		max-width: var(--max-width);;
-		min-width: var(--min-width);
-		margin: 0 auto;
 	}
 
 	::-webkit-scrollbar {
-		width: .5rem;
+		width: var(--scrollbar-width);
 	}
 
 	::-webkit-scrollbar-track {
-		background-color: transparent;
+		background: var(--scrollbar-track-background);
 	}
 
 	::-webkit-scrollbar-thumb {
 		background: var(--scrollbar-thumb-color);
-		border-radius: .2rem;
+		border-radius: var(--scrollbar-thumb-border-radius);
 		opacity: .1;
 	}
 
@@ -90,30 +95,26 @@
 
 	.chat-item {
 		display: flex;
-		margin: .5rem 0;
-		padding: 0 1rem;
-		width: calc(100% - 2rem);
+		margin: var(--chat-item-margin);
+		padding: var(--chat-item-padding-y) var(--chat-item-padding-x);
+		width: calc(var(--chat-item-max-width) - (var(--chat-item-padding-x) * 2));
 	}
 
-	.user {
-		margin-bottom: .25rem;
-	}
-
-	.you .user {
+	.chat-item.you .chat .user {
 		text-align: right;
 	}
 
-	.user .username {
-		color: var(--secondary-color);
-		font-size: smaller;
+	.chat-item .chat .user .username {
+		color: var(--component-secondary-color);
+		font-size: var(--component-small-font);
 	}
 
 	.message {
-		background-color: var(--message-color);
-		border-radius: 0 1rem 1rem 1rem;
+		background: var(--message-other-color);
+		border-radius: 0 var(--message-border-radius) var(--message-border-radius) var(--message-border-radius);
 		justify-content: space-between;
-		max-width: 30rem;
-		padding: .5rem 1rem;
+		max-width: var(--messsage-max-width);
+		padding: var(--message-padding-y) var(--message-padding-x);
 	}
 
 	.you {
@@ -121,52 +122,44 @@
 	}
 
 	.you .message {
-		background-color: var(--message-color-user);
-		border-radius: 1rem 0 1rem 1rem;
+		background: var(--message-you-color);
+		border-radius: var(--message-border-radius) 0 var(--message-border-radius) var(--message-border-radius);
 	}
 
 	.message .time {
-		color: var(--secondary-color);
+		color: var(--component-secondary-color);
 		display: block;
-		font-size: smaller;
+		font-size: var(--component-small-font);
 		text-align: right;
 	}
 
 	.chat-controls {
-		border-top: 1px solid var(--line-color);
-		height: 3rem;
-	}
-
-	.chat-controls {
-		border-top: 1px solid var(--line-color);
-		height: 3rem;
-	}
-
-	.chat-controls {
-		background-color: var(--secondary-bg-color);
+		background: var(--component-secondary-background);
+		border-top: var(--component-border-width) solid var(--component-line-color);
 		display: flex;
-		min-width: var(--min-width);
-		max-width: calc(var(--max-width) - .5rem);
+		height: var(--chat-controls-height);
 		margin: 0 auto;
-		padding: .25rem;
+		max-width: calc(var(--component-max-width) - .5rem);
+		min-width: var(--component-min-width);
+		padding: var(--chat-controls-padding-y) var(--chat-controls-padding-x);
 	}
 
 	.chat-controls .chat-input {
-		background-color: var(--primary-bg-color);
-		border-radius: .25rem;
-		border: none;
-		color: var(--primary-color);
+		background: var(--component-primary-background);
+		border-radius: var(--component-border-radius);
+		border: var(--component-border-width) solid var(--component-line-color);
+		color: var(--component-primary-color);
 		flex: 2;
+		margin-right: var(--toolbar-separator-width);
 		outline: none;
-		padding: .5rem .25rem;
-		margin-right: .25rem;
+		padding: var(--chat-input-padding-y) var(--chat-input-padding-x);
 	}
 
 	.chat-controls button {
-		background-color: var(--secondary-bg-color);
-		border-radius: .25rem;
-		border: 1px solid var(--line-color);
-		color: var(--primary-color);
+		background: var(--component-secondary-background);
+		border-radius: var(--component-border-radius);
+		border: 1px solid var(--component-line-color);
+		color: var(--component-primary-color);
 		cursor: pointer;
 		padding: 0 1rem;
 	}
