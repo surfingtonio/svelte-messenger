@@ -3,6 +3,7 @@
 	import io from 'socket.io-client';
 	import ChatWindow from './components/ChatWindow.svelte';
 	import ChatToolbar from './components/ChatToolbar.svelte';
+	import AjaxLoader from './components/AjaxLoader.svelte';
 
 	let user = {};
 	let usersCount;
@@ -48,12 +49,16 @@
 </script>
 
 <div class="container">
-	<div class="chat-toolbar-wrapper">
-		<ChatToolbar {user} {usersCount} />
-	</div>
-	<div class="chat-window-wrapper">
-		<ChatWindow {user} {chats} on:incomingMessage={handleMessageReceive} />
-	</div>
+	{#if loading}
+		<AjaxLoader />
+	{:else}
+		<div class="chat-toolbar-wrapper">
+			<ChatToolbar {user} {usersCount} />
+		</div>
+		<div class="chat-window-wrapper">
+			<ChatWindow {user} {chats} on:incomingMessage={handleMessageReceive} />
+		</div>
+	{/if}
 </div>
 
 <style>
