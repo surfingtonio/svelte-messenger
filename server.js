@@ -7,6 +7,7 @@ const port = 4000;
 const users = {};
 
 app.use(express.static(__dirname + '/public'))
+app.use('/css/fontawesome', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free'));
 
 nsp.on('connection', socket => {
 

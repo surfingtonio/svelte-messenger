@@ -70,7 +70,6 @@
 		height: calc(var(--component-max-height) - var(--chat-controls-outer-height));
 		margin: 0 auto;
 		max-width: var(--chat-items-max-width);
-		min-width: var(--chat-items-min-width);
 		overflow-x: hidden;
 		overflow-y: scroll;
 	}
@@ -140,8 +139,7 @@
 		display: flex;
 		height: var(--chat-controls-height);
 		margin: 0 auto;
-		max-width: calc(var(--component-max-width) - .5rem);
-		min-width: var(--component-min-width);
+		width: calc(100% - (var(--chat-controls-padding-x) * 2));
 		padding: var(--chat-controls-padding-y) var(--chat-controls-padding-x);
 	}
 

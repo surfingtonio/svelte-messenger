@@ -60,14 +60,10 @@
 		</div>
 	{/if}
 </div>
+<p class="not-supported">Screen not supported</p>
 
 <style>
 	:global(:root) {
-		--badge-background: #7360f2;
-		--badge-padding-x: .75rem;
-		--badge-padding-y: 0;
-		--badge-span-padding-x: .5rem;
-		--badge-span-padding-y: .25rem;
 		--chat-controls-height: 3rem;
 		--chat-controls-padding-x: .25rem;
 		--chat-controls-padding-y: .25rem;
@@ -92,6 +88,7 @@
 		--component-secondary-background: #f5f6f8;
 		--component-secondary-color: #97a4b2;
 		--component-small-font: .75rem;
+		--component-theme-background: #7360f2;
 		--message-border-radius: 1rem;
 		--message-max-width: 30rem;
 		--message-other-color: #efefef;
@@ -110,11 +107,36 @@
 		--chat-toolbar-outer-height: calc(var(--chat-toolbar-height) + (var(--chat-toolbar-padding-y) * 2));
 	}
 
+	.not-supported {
+		display: none;
+	}
+
+	.container {
+		height: 100%;
+		width: 100%;
+	}
+
 	.chat-toolbar-wrapper {
 		height: var(--chat-toolbar-outer-height);
 	}
 
 	.chat-window-wrapper {
 		height: calc(100vh - var(--chat-toolbar-outer-height));
+	}
+
+
+	@media (max-width: 320px) {
+		.container {
+			display: none;
+		}
+
+		.not-supported {
+			align-items: center;
+			display: flex;
+			height: 100vh;
+			justify-content: center;
+			width: 100vw;
+			white-space: nowrap;
+		}
 	}
 </style>

@@ -8,38 +8,55 @@
         <img src="{user.avatar}" alt="" class="avatar" />
         <span class="username">{user.username}</span>
     </div>
-    <div class="badge">Online users <span>{usersCount}</span></div>
+    <div class="controls">
+        <div class="online-users" title="{usersCount} online {usersCount === 1 ? 'user' : 'users'}">
+            <i class="fas fa-users"></i>
+            <span class="usersCount">{usersCount}</span>
+        </div>
+    </div>
 </div>
 
 <style>
+    :root {
+        --online-color: #73C538;
+    }
+
     .chat-toolbar {
         background: var(--component-secondary-background);
         display: flex;
         justify-content: space-between;
         line-height: calc(var(--chat-toolbar-height) - (var(--chat-toolbar-padding-y) * 2));
         padding: var(--chat-toolbar-padding-y) var(--chat-toolbar-padding-x);
+        width: calc(100% - (var(--chat-toolbar-padding-x) * 2));
     }
 
-	.chat-toolbar .badge {
+    .chat-toolbar .controls {
         align-items: center;
-        background: var(--badge-background);
-        border-radius: var(--component-border-radius);
-        border: var(--component-border-width) solid var(--component-line-color);
-        color: #fff;
         display: flex;
-        font-weight: 700;
-        padding: var(--badge-padding-y) var(--badge-padding-x);
-	}
+        font-size: 1.5rem;
+        justify-content: space-between;
+    }
 
-	.chat-toolbar .badge > span {
-        background: #fff;
-        border-radius: var(--component-border-radius);
-        color: #000;
+    .chat-toolbar .online-users {
+        color: var(--component-theme-background);
+    }
+
+    .chat-toolbar .online-users span {
+        background: var(--online-color);
+        border-radius: 50%;
+        border: 1px solid var(--online-color);
+        color: #fff;
         display: inline-block;
-        line-height: 1;
-        margin-left: var(--toolbar-separator-width);
-        padding: var(--badge-span-padding-y) var(--badge-span-padding-x);
-	}
+        font-size: .5rem;
+        font-weight: 700;
+        height: .5rem;
+        line-height: .5rem;
+        margin: 0 0 -.7rem -.7rem;
+        padding: .166rem;
+        text-align: center;
+        vertical-align: middle;
+        width: .5rem;
+    }
 
 	.chat-toolbar .user {
 		display: flex;
@@ -54,6 +71,7 @@
 	.chat-toolbar .user .username {
 		font-size: 1.25rem;
 		font-weight: 700;
-		line-height:  var(--chat-toolbar-height);
-	}
+        line-height:  var(--chat-toolbar-height);
+        white-space: nowrap;
+    }
 </style>
