@@ -31,7 +31,11 @@ nsp.on('connection', socket => {
     socket.on('messagereceive', chat => nsp.emit('messagereceive', chat));
 
     socket.on('keyboardActivity', user => {
-        socket.broadcast.emit('keyboardActivity', []);
+        socket.broadcast.emit('keyboardActivity', user);
+    });
+
+    socket.on('keyboardActivityStop', user => {
+        socket.broadcast.emit('keyboardActivityStop', user);
     });
 });
 

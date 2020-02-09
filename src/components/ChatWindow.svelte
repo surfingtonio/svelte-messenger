@@ -1,10 +1,11 @@
 <script>
 	import { onMount, createEventDispatcher } from 'svelte';
+	import KeyboardActivityIndicator from './KeyboardActivityIndicator.svelte';
 	import moment from 'moment';
 
 	export let user;
 	export let chats = [];
-	export let keyboardActivity = true;
+	export let keyboardActivity = false;
 
 	let chatWindow;
 	let chatInput;
@@ -26,9 +27,7 @@
 	}
 
 	function handleKeydown(event) {
-		if(event.keyCode !== 13) {
-			dispatch('keyboardActivity', user);
-		}
+		event.keyCode === 13 ? dispatch('keyboardActivityStop', user) : dispatch('keyboardActivity', user);
 	}
 
 	onMount(() => {
@@ -55,9 +54,7 @@
 			</div>
 		{/each}
 	</div>
-	{#if keyboardActivity}
-		<span class="keyboard-activity">Someone is typing...</span>
-	{/if}
+	<KeyboardActivityIndicator bind:activity={keyboardActivity} />
 	<form class="chat-controls">
 		<input type="text" class="chat-input" placeholder="Type a message..." bind:this={chatInput} on:keydown={handleKeydown} />
 		<button type="submit" on:click|preventDefault="{handleSendMessage}">Send</button>
@@ -177,20 +174,5 @@
 		color: var(--component-primary-color);
 		cursor: pointer;
 		padding: 0 1rem;
-	}
-
-	.keyboard-activity {
-		background: var(--component-secondary-background);
-		border-radius: var(--component-border-radius);
-		bottom: var(--chat-controls-outer-height);
-		bottom: var(--chat-controls-padding-y);
-		color: var(--component-primary-color);
-		font-size: var(--component-small-font);
-		font-style: italic;
-		left: var(--chat-controls-padding-x);
-		padding: var(--chat-controls-padding-x) calc(var(--chat-controls-padding-x) * 2);
-		position: fixed;
-		bottom: calc(var(--chat-controls-outer-height) + var(--chat-controls-padding-x));
-		opacity: .75;
 	}
 </style>

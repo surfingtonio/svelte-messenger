@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import io from 'socket.io-client';
 	import ChatWindow from './components/ChatWindow.svelte';
 	import ChatToolbar from './components/ChatToolbar.svelte';
@@ -22,12 +22,8 @@
 		socket.emit('keyboardActivity', user);
 	}
 
-	$: if(keyboardActivity) {
-		if(timeout) {
-			clearTimeout(timeout);
-		}
-
-		timeout = setTimeout(() => keyboardActivity = false, 2000);
+	function handlekeyboardActivityStop(event) {
+		socket.emit('keyboardActivityStop', user);
 	}
 
 	socket.on('userleave', user => {
@@ -43,7 +39,16 @@
 		chats = [...chats, chat];
 	});
 
-	socket.on('keyboardActivity', users => keyboardActivity = true);
+	socket.on('keyboardActivity', users => {
+		keyboardActivity = true
+		clearTimeout(timeout);
+		timeout = setTimeout(() => keyboardActivity = false, 1000);
+	});
+
+	socket.on('keyboardActivityStop', user => {
+		keyboardActivity = false;
+		clearTimeout(timeout);
+	});
 
 	onMount(() => {
 		fetch('https://uinames.com/api/?minlen=4&region=canada')
@@ -71,6 +76,8 @@
 		})
 		.catch(err => console.error(err));
 	});
+
+	onDestroy(() => clearInterval(timeout));
 </script>
 
 <div class="container">
@@ -81,7 +88,10 @@
 			<ChatToolbar {user} {usersCount} />
 		</div>
 		<div class="chat-window-wrapper">
-			<ChatWindow {user} {chats} {keyboardActivity} on:incomingMessage={handleMessageReceive} on:keyboardActivity={handlekeyboardActivity} />
+			<ChatWindow {user} {chats} bind:keyboardActivity
+				on:incomingMessage={handleMessageReceive}
+				on:keyboardActivity={handlekeyboardActivity}
+				on:keyboardActivityStop={handlekeyboardActivityStop} />
 		</div>
 	{/if}
 </div>
