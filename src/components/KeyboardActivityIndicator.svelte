@@ -36,6 +36,8 @@
       var(--chat-controls-outer-height) + var(--chat-controls-padding-x)
     );
     opacity: 0.75;
+    margin-top: calc((1rem + var(--chat-controls-padding-x) * 2) * -1);
+    z-index: 99;
   }
 </style>
 
