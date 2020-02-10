@@ -1,9 +1,11 @@
 <script>
   import { onMount, createEventDispatcher } from 'svelte';
+  import ChatToolbar from './ChatToolbar.svelte';
   import KeyboardActivityIndicator from './KeyboardActivityIndicator.svelte';
   import moment from 'moment';
 
   export let user;
+  export let usersCount;
   export let chats = [];
   export let keyboardActivity = false;
 
@@ -41,29 +43,16 @@
 </script>
 
 <style>
-  :root {
-    --chat-controls-outer-height: calc(
-      var(--chat-controls-height) + var(--component-border-width) +
-        (var(--chat-controls-padding-y) * 2)
-    );
-  }
-
-  main {
-    align-items: stretch;
-    background: var(--component-primary-background);
-    color: var(--component-primary-color);
-    height: var(--component-max-height);
+  .chat-window {
+    display: grid;
+    grid-template-rows: 4rem minmax(0, 100vh) 4rem;
+    height: 100vh;
   }
 
   .chat-items {
-    height: calc(
-      var(--component-max-height) - var(--chat-controls-outer-height)
-    );
-    margin: 0 auto;
-    max-width: var(--chat-items-max-width);
+    height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-    position: relative;
   }
 
   ::-webkit-scrollbar {
@@ -134,12 +123,10 @@
 
   .chat-controls {
     background: var(--component-secondary-background);
-    border-top: var(--component-border-width) solid var(--component-line-color);
     display: flex;
-    height: var(--chat-controls-height);
-    margin: 0 auto;
+    height: calc(100% - (var(--chat-controls-padding-y) * 2));
+    margin: 0;
     padding: var(--chat-controls-padding-y) var(--chat-controls-padding-x);
-    width: calc(100% - (var(--chat-controls-padding-x) * 2));
   }
 
   .chat-controls .chat-input {
@@ -163,36 +150,43 @@
   }
 </style>
 
-<main>
-  <div class="chat-items" bind:this={chatWindow}>
-    {#each chats as chat}
-      <div class={chat.user.id === user.id ? 'chat-item you' : 'chat-item'}>
-        <div class="chat">
-          <div class="user">
-            <span class="username">
-              {chat.user.id === user.id ? 'You' : chat.user.username}
-            </span>
-          </div>
-          <div class="message">
-            <span class="content">{chat.message.content}</span>
-            <span class="time">
-              {moment(chat.message.time).format('h:mm:ss a')}
-            </span>
+<div class="chat-window">
+  <section>
+    <ChatToolbar {user} {usersCount} />
+  </section>
+  <section>
+    <div class="chat-items" bind:this={chatWindow}>
+      {#each chats as chat}
+        <div class={chat.user.id === user.id ? 'chat-item you' : 'chat-item'}>
+          <div class="chat">
+            <div class="user">
+              <span class="username">
+                {chat.user.id === user.id ? 'You' : chat.user.username}
+              </span>
+            </div>
+            <div class="message">
+              <span class="content">{chat.message.content}</span>
+              <span class="time">
+                {moment(chat.message.time).format('h:mm:ss a')}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    {/each}
-  </div>
-  <KeyboardActivityIndicator bind:activity={keyboardActivity} />
-  <form class="chat-controls">
-    <input
-      type="text"
-      class="chat-input"
-      placeholder="Type a message..."
-      bind:this={chatInput}
-      on:keydown={handleKeydown} />
-    <button type="submit" on:click|preventDefault={handleSendMessage}>
-      Send
-    </button>
-  </form>
-</main>
+      {/each}
+    </div>
+    <KeyboardActivityIndicator bind:activity={keyboardActivity} />
+  </section>
+  <section>
+    <form class="chat-controls">
+      <input
+        type="text"
+        class="chat-input"
+        placeholder="Type a message..."
+        bind:this={chatInput}
+        on:keydown={handleKeydown} />
+      <button type="submit" on:click|preventDefault={handleSendMessage}>
+        Send
+      </button>
+    </form>
+  </section>
+</div>

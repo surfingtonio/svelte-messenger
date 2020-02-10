@@ -2,7 +2,6 @@
   import { onMount, onDestroy } from 'svelte';
   import io from 'socket.io-client';
   import ChatWindow from './components/ChatWindow.svelte';
-  import ChatToolbar from './components/ChatToolbar.svelte';
   import AjaxLoader from './components/AjaxLoader.svelte';
 
   let user = {};
@@ -122,27 +121,15 @@
     --toolbar-separator-width: 0.25rem;
   }
 
-  :root {
-    --chat-toolbar-outer-height: calc(
-      var(--chat-toolbar-height) + (var(--chat-toolbar-padding-y) * 2)
-    );
-  }
-
   .not-supported {
     display: none;
   }
 
   .container {
-    height: 100%;
-    width: 100%;
-  }
-
-  .chat-toolbar-wrapper {
-    height: var(--chat-toolbar-outer-height);
-  }
-
-  .chat-window-wrapper {
-    height: calc(100vh - var(--chat-toolbar-outer-height));
+    display: grid;
+    grid-template-columns: auto;
+    height: 100vh;
+    width: 100vw;
   }
 
   @media (max-width: 320px) {
@@ -155,8 +142,8 @@
       display: flex;
       height: 100vh;
       justify-content: center;
-      width: 100vw;
       white-space: nowrap;
+      width: 100vw;
     }
   }
 </style>
@@ -165,18 +152,16 @@
   {#if loading}
     <AjaxLoader />
   {:else}
-    <div class="chat-toolbar-wrapper">
-      <ChatToolbar {user} {usersCount} />
-    </div>
-    <div class="chat-window-wrapper">
+    <section>
       <ChatWindow
         {user}
+        {usersCount}
         bind:chats
         bind:keyboardActivity
         on:incomingMessage={handleMessageReceive}
         on:keyboardActivity={handlekeyboardActivity}
         on:keyboardActivityStop={handlekeyboardActivityStop} />
-    </div>
+    </section>
   {/if}
 </div>
 <p class="not-supported">Screen not supported</p>

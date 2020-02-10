@@ -11,10 +11,8 @@
   .chat-toolbar {
     background: var(--component-secondary-background);
     display: flex;
+    height: calc(100% - (var(--chat-toolbar-padding-y) * 2));
     justify-content: space-between;
-    line-height: calc(
-      var(--chat-toolbar-height) - (var(--chat-toolbar-padding-y) * 2)
-    );
     padding: var(--chat-toolbar-padding-y) var(--chat-toolbar-padding-x);
     width: calc(100% - (var(--chat-toolbar-padding-x) * 2));
   }
