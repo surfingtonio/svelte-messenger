@@ -1,6 +1,7 @@
 <script>
   import { onMount, createEventDispatcher } from 'svelte';
   import ChatToolbar from './ChatToolbar.svelte';
+  import ChatControls from './ChatControls.svelte';
   import KeyboardActivityIndicator from './KeyboardActivityIndicator.svelte';
   import moment from 'moment';
 
@@ -10,25 +11,19 @@
   export let keyboardActivity = false;
 
   let chatWindow;
-  let chatInput;
 
   const dispatch = createEventDispatcher();
 
-  function handleSendMessage() {
-    let content = chatInput.value.trim();
-    chatInput.value = '';
-
-    if (content !== '') {
-      let chat = {
-        message: { content, time: new Date() },
-        user
-      };
-      chats = [...chats, chat];
-      dispatch('incomingMessage', chat);
-    }
+  function handleMessageSend(event) {
+    let chat = {
+      message: { content: event.detail, time: new Date() },
+      user
+    };
+    chats = [...chats, chat];
+    dispatch('incomingMessage', chat);
   }
 
-  function handleKeydown(event) {
+  function handleKeyboardActivity(event) {
     event.keyCode === 13
       ? dispatch('keyboardActivityStop', user)
       : dispatch('keyboardActivity', user);
@@ -120,40 +115,13 @@
     font-size: var(--component-small-font);
     text-align: right;
   }
-
-  .chat-controls {
-    background: var(--component-secondary-background);
-    display: flex;
-    height: calc(100% - (var(--chat-controls-padding-y) * 2));
-    margin: 0;
-    padding: var(--chat-controls-padding-y) var(--chat-controls-padding-x);
-  }
-
-  .chat-controls .chat-input {
-    background: var(--component-primary-background);
-    border-radius: var(--component-border-radius);
-    border: var(--component-border-width) solid var(--component-line-color);
-    color: var(--component-primary-color);
-    flex: 2;
-    margin-right: var(--toolbar-separator-width);
-    outline: none;
-    padding: var(--chat-input-padding-y) var(--chat-input-padding-x);
-  }
-
-  .chat-controls button {
-    background: var(--component-secondary-background);
-    border-radius: var(--component-border-radius);
-    border: 1px solid var(--component-line-color);
-    color: var(--component-primary-color);
-    cursor: pointer;
-    padding: 0 1rem;
-  }
 </style>
 
 <div class="chat-window">
   <section>
     <ChatToolbar {user} {usersCount} />
   </section>
+
   <section>
     <div class="chat-items" bind:this={chatWindow}>
       {#each chats as chat}
@@ -176,17 +144,10 @@
     </div>
     <KeyboardActivityIndicator bind:activity={keyboardActivity} />
   </section>
+
   <section>
-    <form class="chat-controls">
-      <input
-        type="text"
-        class="chat-input"
-        placeholder="Type a message..."
-        bind:this={chatInput}
-        on:keydown={handleKeydown} />
-      <button type="submit" on:click|preventDefault={handleSendMessage}>
-        Send
-      </button>
-    </form>
+    <ChatControls
+      on:keyboardactivity={handleKeyboardActivity}
+      on:messagesend={handleMessageSend} />
   </section>
 </div>
