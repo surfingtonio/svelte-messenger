@@ -1,7 +1,7 @@
 <script>
   import { onDestroy } from 'svelte';
 
-  export let activity = false;
+  export let keyboardActivity = false;
   export let status = 'Someone is typing';
   let ellipsis = '';
   let interval;
@@ -14,7 +14,9 @@
     }, 400);
   }
 
-  $: activity ? (interval = animateEllipsis()) : clearInterval(interval);
+  $: keyboardActivity
+    ? (interval = animateEllipsis())
+    : clearInterval(interval);
 
   onDestroy(() => clearInterval(interval));
 </script>
@@ -41,6 +43,6 @@
   }
 </style>
 
-{#if activity}
+{#if keyboardActivity}
   <span class="keyboard-activity">{status}{ellipsis}</span>
 {/if}

@@ -22,7 +22,7 @@
   }
 
   function handleKeyboardActivity(event) {
-    event.keyCode === 13
+    event.detail.keyCode === 13
       ? dispatch('keyboardactivitystop', user)
       : dispatch('keyboardactivity', user);
   }
@@ -43,7 +43,7 @@
 
   <section>
     <ChatMessages {user} {chats} />
-    <KeyboardActivityIndicator bind:activity={keyboardActivity} />
+    <KeyboardActivityIndicator bind:keyboardActivity />
   </section>
 
   <section>
