@@ -46,13 +46,14 @@
   }
 
   .chat-toolbar .user {
-    display: flex;
     align-items: center;
+    display: flex;
   }
 
   .chat-toolbar .user .avatar {
-    height: var(--chat-toolbar-height);
+    border-radius: 40%;
     margin-right: var(--toolbar-separator-width);
+    max-height: 100%;
   }
 
   .chat-toolbar .user .username {
@@ -65,7 +66,7 @@
 
 <div class="chat-toolbar">
   <div class="user">
-    <img src={user.avatar} alt="" class="avatar" />
+    <img src={user.avatar} alt={user.username} class="avatar" />
     <span class="username">{user.username}</span>
   </div>
   <div class="controls">

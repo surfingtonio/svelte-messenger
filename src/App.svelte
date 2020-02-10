@@ -50,17 +50,18 @@
   });
 
   onMount(() => {
-    fetch('https://uinames.com/api/?minlen=4&region=canada')
+    fetch('https://randomuser.me/api/?nat=us,ca')
       .then(res => {
         loading = false;
         if (res.ok) {
           res
             .json()
-            .then(data => {
+            .then(res => {
+              let fakeUser = res.results[0];
               user = {
                 id: new Date().getTime(),
-                username: `${data.name} ${data.surname}`,
-                avatar: `./images/avatar-${data.gender}.png`
+                username: `${fakeUser.name.first} ${fakeUser.name.last}`,
+                avatar: fakeUser.picture.thumbnail
               };
               socket.emit('userregister', user);
             })
