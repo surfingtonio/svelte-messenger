@@ -171,7 +171,7 @@
     <div class="chat-window-wrapper">
       <ChatWindow
         {user}
-        {chats}
+        bind:chats
         bind:keyboardActivity
         on:incomingMessage={handleMessageReceive}
         on:keyboardActivity={handlekeyboardActivity}

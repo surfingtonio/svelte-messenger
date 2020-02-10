@@ -17,13 +17,12 @@
     chatInput.value = '';
 
     if (content !== '') {
-      dispatch('incomingMessage', {
-        message: {
-          content,
-          time: new Date()
-        },
+      let chat = {
+        message: { content, time: new Date() },
         user
-      });
+      };
+      chats = [...chats, chat];
+      dispatch('incomingMessage', chat);
     }
   }
 
