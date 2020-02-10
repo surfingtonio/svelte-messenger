@@ -132,7 +132,7 @@
     width: 100vw;
   }
 
-  @media (max-width: 320px) {
+  @media (max-width: 319px), (max-height: 319px) {
     .container {
       display: none;
     }
@@ -164,4 +164,4 @@
     </section>
   {/if}
 </div>
-<p class="not-supported">Screen not supported</p>
+<p class="not-supported">Screen size not supported</p>
