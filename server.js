@@ -45,12 +45,12 @@ nsp.on('connection', socket => {
     socket.broadcast.emit('messagereceive', chat);
   });
 
-  socket.on('keyboardActivity', user => {
-    socket.broadcast.emit('keyboardActivity', user);
+  socket.on('keyboardactivity', user => {
+    socket.broadcast.emit('keyboardactivity', user);
   });
 
-  socket.on('keyboardActivityStop', user => {
-    socket.broadcast.emit('keyboardActivityStop', user);
+  socket.on('keyboardactivitystop', user => {
+    socket.broadcast.emit('keyboardactivitystop', user);
   });
 });
 

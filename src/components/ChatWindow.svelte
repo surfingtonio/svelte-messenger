@@ -18,13 +18,13 @@
       user
     };
     chats = [...chats, chat];
-    dispatch('incomingMessage', chat);
+    dispatch('messagesend', chat);
   }
 
   function handleKeyboardActivity(event) {
     event.keyCode === 13
-      ? dispatch('keyboardActivityStop', user)
-      : dispatch('keyboardActivity', user);
+      ? dispatch('keyboardactivitystop', user)
+      : dispatch('keyboardactivity', user);
   }
 </script>
 

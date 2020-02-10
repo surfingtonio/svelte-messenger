@@ -18,11 +18,11 @@
   }
 
   function handlekeyboardActivity(event) {
-    socket.emit('keyboardActivity', user);
+    socket.emit('keyboardactivity', user);
   }
 
   function handlekeyboardActivityStop(event) {
-    socket.emit('keyboardActivityStop', user);
+    socket.emit('keyboardactivitystop', user);
   }
 
   socket.on('userleave', user => {
@@ -38,13 +38,13 @@
     chats = [...chats, chat];
   });
 
-  socket.on('keyboardActivity', users => {
+  socket.on('keyboardactivity', users => {
     keyboardActivity = true;
     clearTimeout(timeout);
     timeout = setTimeout(() => (keyboardActivity = false), 1000);
   });
 
-  socket.on('keyboardActivityStop', user => {
+  socket.on('keyboardactivitystop', user => {
     keyboardActivity = false;
     clearTimeout(timeout);
   });
@@ -158,9 +158,9 @@
         {usersCount}
         bind:chats
         bind:keyboardActivity
-        on:incomingMessage={handleMessageReceive}
-        on:keyboardActivity={handlekeyboardActivity}
-        on:keyboardActivityStop={handlekeyboardActivityStop} />
+        on:messagesend={handleMessageReceive}
+        on:keyboardactivity={handlekeyboardActivity}
+        on:keyboardactivitystop={handlekeyboardActivityStop} />
     </section>
   {/if}
 </div>
