@@ -13,11 +13,11 @@
 
   const socket = io('/chatrooms');
 
-  function handleMessageReceive(event) {
-    socket.emit('messagereceive', event.detail);
+  function handleChatReceive(event) {
+    socket.emit('chatreceive', event.detail);
   }
 
-  function handlekeyboardActivity(event) {
+  function handleKeyboardActivity(event) {
     socket.emit('keyboardactivity', user);
   }
 
@@ -159,8 +159,8 @@
         {usersCount}
         bind:chats
         bind:keyboardActivity
-        on:messagesend={handleMessageReceive}
-        on:keyboardactivity={handlekeyboardActivity}
+        on:chatreceive={handleChatReceive}
+        on:keyboardactivity={handleKeyboardActivity}
         on:keyboardactivitystop={handlekeyboardActivityStop} />
     </section>
   {/if}

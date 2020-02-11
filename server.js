@@ -41,7 +41,7 @@ nsp.on('connection', socket => {
     );
   });
 
-  socket.on('messagereceive', chat => {
+  socket.on('chatreceive', chat => {
     socket.broadcast.emit('messagereceive', chat);
   });
 

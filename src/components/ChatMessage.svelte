@@ -8,6 +8,7 @@
 <style>
   .chat-message {
     display: flex;
+    padding-bottom: 0.5rem;
   }
 
   .chat-message .chat {
@@ -54,10 +55,40 @@
       max-width: 100%;
     }
   }
+
+  .chat {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .chat .user {
+    flex-basis: 100%;
+    order: 1;
+    width: 100%;
+  }
+
+  .chat .avatar {
+    border-radius: 40%;
+    flex-basis: auto;
+    flex: 0;
+    height: 2rem;
+    margin-right: 0.25rem;
+    order: 2;
+  }
+
+  .chat .message {
+    flex-basis: auto;
+    flex: 1;
+    order: 3;
+  }
 </style>
 
 <div class={chat.user.id === user.id ? 'chat-message you' : 'chat-message'}>
   <div class="chat">
+    {#if chat.user.id !== user.id}
+      <img src={chat.user.avatar} alt={chat.user.username} class="avatar" />
+    {/if}
     <div class="user">
       <span class="username">
         {chat.user.id === user.id ? 'You' : chat.user.username}

@@ -18,7 +18,7 @@
       user
     };
     chats = [...chats, chat];
-    dispatch('messagesend', chat);
+    dispatch('chatreceive', chat);
   }
 
   function handleKeyboardActivity(event) {
