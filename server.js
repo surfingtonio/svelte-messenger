@@ -19,7 +19,7 @@ nsp.on('connection', socket => {
     const user = users[socket.id];
 
     delete users[socket.id];
-    nsp.emit('userleave', user);
+    nsp.emit('userleave', { user, users });
 
     console.log(
       `${user.username} has left. There are ${

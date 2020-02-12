@@ -52,7 +52,7 @@
 
   .chat-toolbar .user .avatar {
     border-radius: 40%;
-    margin-right: var(--toolbar-separator-width);
+    margin-right: 0.75rem;
     max-height: 100%;
   }
 

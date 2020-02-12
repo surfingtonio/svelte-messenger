@@ -1,10 +1,12 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import io from 'socket.io-client';
+  import ChatBuddiesWindow from './components/ChatBuddiesWindow.svelte';
   import ChatWindow from './components/ChatWindow.svelte';
   import AjaxLoader from './components/AjaxLoader.svelte';
 
   let user = {};
+  let users = [];
   let usersCount;
   let chats = [];
   let loading = true;
@@ -25,13 +27,17 @@
     socket.emit('keyboardactivitystop', user);
   }
 
-  socket.on('userleave', user => {
-    usersCount--;
-  });
+  function handleUserAction(data) {
+    let everyone = Object.values(data.users);
+    users = everyone.filter(buddy => buddy.id !== user.id);
+    usersCount = everyone.length;
+  }
+
+  socket.on('userleave', data => handleUserAction(data));
 
   socket.on('userregister', registeredUser => (user = registeredUser));
 
-  socket.on('userjoin', data => (usersCount = Object.keys(data.users).length));
+  socket.on('userjoin', data => handleUserAction(data));
 
   socket.on('messagereceive', chat => {
     new Audio('./sounds/pling.mp3').play();
@@ -122,13 +128,33 @@
     --toolbar-separator-width: 0.25rem;
   }
 
+  :global(::-webkit-scrollbar) {
+    width: var(--scrollbar-width);
+  }
+
+  :global(::-webkit-scrollbar-track) {
+    background: var(--scrollbar-track-background);
+  }
+
+  :global(::-webkit-scrollbar-thumb) {
+    background: var(--scrollbar-thumb-color);
+    border-radius: var(--scrollbar-thumb-border-radius);
+    opacity: 0.1;
+  }
+
+  :global(::-webkit-scrollbar-thumb:hover) {
+    background: var(--scrollbar-thumb-hover-color);
+    opacity: 1;
+  }
+
   .not-supported {
     display: none;
   }
 
   .container {
     display: grid;
-    grid-template-columns: auto;
+    grid-template-columns: 18rem auto;
+    grid-template-rows: minmax(0, 100vh) auto;
     height: 100vh;
     width: 100vw;
   }
@@ -153,6 +179,9 @@
   {#if loading}
     <AjaxLoader />
   {:else}
+    <section>
+      <ChatBuddiesWindow bind:users />
+    </section>
     <section>
       <ChatWindow
         {user}
