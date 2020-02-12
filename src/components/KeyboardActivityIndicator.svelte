@@ -2,7 +2,7 @@
   import { onDestroy } from 'svelte';
 
   export let keyboardActivity = false;
-  export let status = 'Someone is typing';
+  export let keyboardActivityStatus = 'Someone is typing';
   let ellipsis = '';
   let interval;
 
@@ -38,5 +38,5 @@
 </style>
 
 {#if keyboardActivity}
-  <span class="keyboard-activity">{status}{ellipsis}</span>
+  <span class="keyboard-activity">{keyboardActivityStatus}{ellipsis}</span>
 {/if}

@@ -1,17 +1,20 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import io from 'socket.io-client';
+  import Home from './components/Home.svelte';
   import ChatBuddiesWindow from './components/ChatBuddiesWindow.svelte';
   import ChatWindow from './components/ChatWindow.svelte';
   import AjaxLoader from './components/AjaxLoader.svelte';
 
   let user = {};
+  let selectedUser;
   let users = [];
   let usersCount;
   let chats = [];
   let loading = true;
   let timeout;
   let keyboardActivity = false;
+  let keyboardActivityStatus;
 
   const socket = io('/chatrooms');
 
@@ -20,41 +23,50 @@
   }
 
   function handleKeyboardActivity(event) {
-    socket.emit('keyboardactivity', user);
+    socket.emit('keyboardactivity', {
+      user: user,
+      socketId: selectedUser.socketId
+    });
   }
 
   function handlekeyboardActivityStop(event) {
-    socket.emit('keyboardactivitystop', user);
+    socket.emit('keyboardactivitystop', {
+      user: user,
+      socketId: user.socketId
+    });
   }
 
-  function handleUserAction(data) {
-    let everyone = Object.values(data.users);
+  function handleUserAction(event) {
+    let everyone = Object.values(event.users);
     users = everyone.filter(buddy => buddy.id !== user.id);
     usersCount = everyone.length;
   }
 
   function handleSelectBuddy(event) {
-    user = event.detail;
+    selectedUser = event.detail;
   }
 
-  socket.on('userleave', data => handleUserAction(data));
+  socket.on('userleave', event => handleUserAction(event));
 
-  socket.on('userregister', registeredUser => (user = registeredUser));
+  socket.on('userregister', registeredUser => {
+    user = registeredUser;
+  });
 
-  socket.on('userjoin', data => handleUserAction(data));
+  socket.on('userjoin', event => handleUserAction(event));
 
   socket.on('messagereceive', chat => {
     new Audio('./sounds/pling.mp3').play();
     chats = [...chats, chat];
   });
 
-  socket.on('keyboardactivity', users => {
+  socket.on('keyboardactivity', event => {
+    keyboardActivityStatus = `${event.user.username} is typing`;
     keyboardActivity = true;
     clearTimeout(timeout);
     timeout = setTimeout(() => (keyboardActivity = false), 1000);
   });
 
-  socket.on('keyboardactivitystop', user => {
+  socket.on('keyboardactivitystop', event => {
     keyboardActivity = false;
     clearTimeout(timeout);
   });
@@ -186,16 +198,24 @@
     <section>
       <ChatBuddiesWindow bind:users on:selectbuddy={handleSelectBuddy} />
     </section>
-    <section>
-      <ChatWindow
-        {user}
-        {usersCount}
-        bind:chats
-        bind:keyboardActivity
-        on:chatreceive={handleChatReceive}
-        on:keyboardactivity={handleKeyboardActivity}
-        on:keyboardactivitystop={handlekeyboardActivityStop} />
-    </section>
+    {#if typeof selectedUser !== 'undefined'}
+      <section>
+        <ChatWindow
+          {user}
+          {selectedUser}
+          {usersCount}
+          bind:chats
+          bind:keyboardActivity
+          bind:keyboardActivityStatus
+          on:chatreceive={handleChatReceive}
+          on:keyboardactivity={handleKeyboardActivity}
+          on:keyboardactivitystop={handlekeyboardActivityStop} />
+      </section>
+    {:else}
+      <section class="home">
+        <Home {user} {usersCount} />
+      </section>
+    {/if}
   </div>
 {/if}
 <p class="not-supported">Screen size not supported</p>

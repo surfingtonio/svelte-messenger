@@ -32,10 +32,11 @@ nsp.on('connection', socket => {
   });
 
   socket.on('userregister', user => {
-    users[socket.id] = user;
+    const registeredUser = { ...user, socketId: socket.id };
+    users[socket.id] = registeredUser;
 
-    socket.emit('userregister', user);
-    nsp.emit('userjoin', { user, users });
+    socket.emit('userregister', registeredUser);
+    nsp.emit('userjoin', { registeredUser, users });
 
     console.log(
       `${user.username} joined. There are ${
@@ -48,12 +49,12 @@ nsp.on('connection', socket => {
     socket.broadcast.emit('messagereceive', chat);
   });
 
-  socket.on('keyboardactivity', user => {
-    socket.broadcast.emit('keyboardactivity', user);
+  socket.on('keyboardactivity', data => {
+    socket.to(`${data.socketId}`).emit('keyboardactivity', data);
   });
 
-  socket.on('keyboardactivitystop', user => {
-    socket.broadcast.emit('keyboardactivitystop', user);
+  socket.on('keyboardactivitystop', data => {
+    socket.broadcast.emit('keyboardactivitystop', data);
   });
 });
 

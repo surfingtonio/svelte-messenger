@@ -6,9 +6,11 @@
   import KeyboardActivityIndicator from './KeyboardActivityIndicator.svelte';
 
   export let user;
+  export let selectedUser;
   export let usersCount;
   export let chats = [];
   export let keyboardActivity = false;
+  export let keyboardActivityStatus;
 
   const dispatch = createEventDispatcher();
 
@@ -38,12 +40,12 @@
 
 <div class="chat-window">
   <section>
-    <ChatToolbar {user} {usersCount} />
+    <ChatToolbar user={selectedUser} {usersCount} />
   </section>
 
   <section>
     <ChatMessages {user} {chats} />
-    <KeyboardActivityIndicator bind:keyboardActivity />
+    <KeyboardActivityIndicator {keyboardActivityStatus} bind:keyboardActivity />
   </section>
 
   <section>

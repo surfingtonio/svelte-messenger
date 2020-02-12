@@ -3,6 +3,7 @@
   import ChatBuddies from './ChatBuddies.svelte';
 
   export let users = [];
+  export let selectedUser = {};
 
   function handleFilterUsers(event) {
     filteredUsers = users.filter(user => {
@@ -28,6 +29,6 @@
     <ChatBuddiesToolbar on:filterusers={handleFilterUsers} />
   </section>
   <section>
-    <ChatBuddies users={filteredUsers} on:selectbuddy />
+    <ChatBuddies {selectedUser} users={filteredUsers} on:selectbuddy />
   </section>
 </div>
