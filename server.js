@@ -17,6 +17,9 @@ app.use(
 nsp.on('connection', socket => {
   socket.on('disconnect', () => {
     const user = users[socket.id];
+    if (typeof user === 'undefined') {
+      return;
+    }
 
     delete users[socket.id];
     nsp.emit('userleave', { user, users });
