@@ -25,18 +25,12 @@
   .keyboard-activity {
     background: var(--component-secondary-background);
     border-radius: var(--component-border-radius);
-    bottom: var(--chat-controls-outer-height);
-    bottom: var(--chat-controls-padding-y);
     color: var(--component-primary-color);
     font-size: var(--component-small-font);
     font-style: italic;
-    left: var(--chat-controls-padding-x);
     padding: var(--chat-controls-padding-x)
       calc(var(--chat-controls-padding-x) * 2);
     position: fixed;
-    bottom: calc(
-      var(--chat-controls-outer-height) + var(--chat-controls-padding-x)
-    );
     opacity: 0.75;
     margin-top: calc((1rem + var(--chat-controls-padding-x) * 2) * -1);
     z-index: 99;
