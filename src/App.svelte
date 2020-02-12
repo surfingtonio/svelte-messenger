@@ -179,10 +179,10 @@
   }
 </style>
 
-<div class="container">
-  {#if loading}
-    <AjaxLoader />
-  {:else}
+{#if loading}
+  <AjaxLoader />
+{:else}
+  <div class="container">
     <section>
       <ChatBuddiesWindow bind:users on:selectbuddy={handleSelectBuddy} />
     </section>
@@ -196,6 +196,6 @@
         on:keyboardactivity={handleKeyboardActivity}
         on:keyboardactivitystop={handlekeyboardActivityStop} />
     </section>
-  {/if}
-</div>
+  </div>
+{/if}
 <p class="not-supported">Screen size not supported</p>
