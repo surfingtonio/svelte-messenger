@@ -33,6 +33,10 @@
     usersCount = everyone.length;
   }
 
+  function handleSelectBuddy(event) {
+    user = event.detail;
+  }
+
   socket.on('userleave', data => handleUserAction(data));
 
   socket.on('userregister', registeredUser => (user = registeredUser));
@@ -180,7 +184,7 @@
     <AjaxLoader />
   {:else}
     <section>
-      <ChatBuddiesWindow bind:users />
+      <ChatBuddiesWindow bind:users on:selectbuddy={handleSelectBuddy} />
     </section>
     <section>
       <ChatWindow

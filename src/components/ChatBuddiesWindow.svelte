@@ -28,6 +28,6 @@
     <ChatBuddiesToolbar on:filterusers={handleFilterUsers} />
   </section>
   <section>
-    <ChatBuddies users={filteredUsers} />
+    <ChatBuddies users={filteredUsers} on:selectbuddy />
   </section>
 </div>
