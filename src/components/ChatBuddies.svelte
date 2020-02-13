@@ -3,13 +3,13 @@
   import ChatBuddy from './ChatBuddy.svelte';
 
   export let users = [];
-  export let selectedUser;
+  export let selectedUserId;
 
   const dispatch = createEventDispatcher();
 
-  function handleSelectBuddy(event) {
-    selectedUser = event.detail;
-    dispatch('selectbuddy', selectedUser);
+  function handleClick(user, e) {
+    selectedUserId = user.id;
+    dispatch('selectbuddy', user);
   }
 </script>
 
@@ -28,7 +28,7 @@
   {#each users as user}
     <ChatBuddy
       {user}
-      selected={typeof selectedUser !== 'undefined' && user.id === selectedUser.id}
-      on:selectbuddy={handleSelectBuddy} />
+      selected={user.id === selectedUserId}
+      on:click={handleClick.bind(this, user)} />
   {/each}
 </div>

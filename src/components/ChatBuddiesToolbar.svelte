@@ -1,13 +1,13 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  let searchInput;
-
-  function handleChange(event) {
-    dispatch('filterusers', searchInput.value);
-  }
+  let search;
 
   const dispatch = createEventDispatcher();
+
+  function handleFilterUsers() {
+    dispatch('filterusers', search);
+  }
 </script>
 
 <style>
@@ -45,8 +45,10 @@
 
 <div class="chat-buddies-toolbar">
   <form class="search">
-    <input type="text" placeholder="Search..." bind:this={searchInput} />
-    <button class="button search-button" on:click|preventDefault={handleChange}>
+    <input type="text" placeholder="Search..." bind:value={search} on:input />
+    <button
+      class="button search-button"
+      on:click|preventDefault={handleFilterUsers}>
       <i class="fas fa-search search-icon" />
     </button>
   </form>

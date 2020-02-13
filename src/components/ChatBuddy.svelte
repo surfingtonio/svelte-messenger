@@ -1,14 +1,6 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-
   export let user;
   export let selected = false;
-
-  const dispatch = createEventDispatcher();
-
-  function handleClick(event) {
-    dispatch('selectbuddy', user);
-  }
 </script>
 
 <style>
@@ -35,7 +27,7 @@
   }
 </style>
 
-<div class="chat-buddy" class:selected on:click={handleClick}>
+<div class="chat-buddy" class:selected on:click>
   <img src={user.avatar} alt={user.username} class="avatar" />
   <div class="user">{user.username}</div>
 </div>
