@@ -1,15 +1,15 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  let chatInput;
+  let message;
 
   const dispatch = createEventDispatcher();
 
-  function handleSendMessage() {
-    let message = chatInput.value.trim();
-    chatInput.value = '';
+  function handleMessageSend(event) {
+    message = message.trim();
     if (message !== '') {
       dispatch('messagesend', message);
+      message = '';
     }
   }
 
@@ -53,9 +53,9 @@
     type="text"
     class="chat-input"
     placeholder="Type a message..."
-    bind:this={chatInput}
+    bind:value={message}
     on:keydown={handleKeydown} />
-  <button type="submit" on:click|preventDefault={handleSendMessage}>
+  <button type="submit" on:click|preventDefault={handleMessageSend}>
     Send
   </button>
 </form>

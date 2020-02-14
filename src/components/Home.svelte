@@ -37,7 +37,7 @@
       Hi
       <span>{user.username}</span>
     </p>
-    {#if usersCount > 1}
+    {#if usersCount > 0}
       <p>Select a user on the left to start chatting.</p>
     {:else}
       <p>There are no online users at the moment.</p>

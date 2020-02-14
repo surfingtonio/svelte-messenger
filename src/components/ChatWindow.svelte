@@ -5,29 +5,28 @@
   import ChatControls from './ChatControls.svelte';
   import KeyboardActivityIndicator from './KeyboardActivityIndicator.svelte';
 
-  export let user;
-  export let selectedUser;
+  export let sender;
+  export let receiver;
   export let usersCount;
   export let chats = [];
+
   export let keyboardActivity = false;
   export let keyboardActivityStatus;
 
   const dispatch = createEventDispatcher();
 
   function handleMessageSend(event) {
-    let chat = {
-      message: { content: event.detail, time: new Date() },
-      user
-    };
-    chats = [...chats, chat];
-    dispatch('chatreceive', chat);
+    dispatch('messagesend', event.detail);
   }
 
   function handleKeyboardActivity(event) {
     event.detail.keyCode === 13
-      ? dispatch('keyboardactivitystop', user)
-      : dispatch('keyboardactivity', user);
+      ? dispatch('keyboardactivitystop', sender)
+      : dispatch('keyboardactivity', sender);
   }
+
+  $: chatToolbarProps = { user: receiver, usersCount };
+  $: chatMessagesProps = { user: sender, chats };
 </script>
 
 <style>
@@ -40,12 +39,12 @@
 
 <div class="chat-window">
   <section>
-    <ChatToolbar user={selectedUser} {usersCount} />
+    <ChatToolbar {...chatToolbarProps} />
   </section>
 
   <section>
-    <ChatMessages {user} {chats} />
-    <KeyboardActivityIndicator {keyboardActivityStatus} bind:keyboardActivity />
+    <ChatMessages {...chatMessagesProps} />
+    <KeyboardActivityIndicator bind:keyboardActivity {keyboardActivityStatus} />
   </section>
 
   <section>

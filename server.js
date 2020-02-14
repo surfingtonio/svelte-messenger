@@ -36,7 +36,7 @@ nsp.on('connection', socket => {
     users[socket.id] = registeredUser;
 
     socket.emit('userregister', registeredUser);
-    nsp.emit('userjoin', { registeredUser, users });
+    nsp.emit('afteruserregister', { socketId: socket.id, users });
 
     console.log(
       `${user.username} joined. There are ${
@@ -45,16 +45,18 @@ nsp.on('connection', socket => {
     );
   });
 
-  socket.on('chatreceive', chat => {
-    socket.broadcast.emit('messagereceive', chat);
+  socket.on('messagesend', data => {
+    // user: { id, username, avatar, socketId }
+    // chat: { message: {content, time}, sender: <user>, receiver: <user> }
+    socket.to(data.receiver.socketId).emit('messagereceive', data);
   });
 
   socket.on('keyboardactivity', data => {
-    socket.to(`${data.socketId}`).emit('keyboardactivity', data);
+    socket.to(data.receiver.socketId).emit('keyboardactivity', data);
   });
 
   socket.on('keyboardactivitystop', data => {
-    socket.broadcast.emit('keyboardactivitystop', data);
+    socket.to(data.receiver.socketId).emit('keyboardactivitystop', data);
   });
 });
 

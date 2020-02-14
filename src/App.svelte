@@ -1,69 +1,99 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import app from './store.js';
   import io from 'socket.io-client';
+  import _ from 'lodash';
   import Home from './components/Home.svelte';
   import ChatBuddiesWindow from './components/ChatBuddiesWindow.svelte';
   import ChatWindow from './components/ChatWindow.svelte';
   import AjaxLoader from './components/AjaxLoader.svelte';
 
-  let user = {};
-  let selectedUser;
-  let users = [];
-  let usersCount;
-  let chats = [];
-  let loading = true;
+  let chats;
   let timeout;
   let keyboardActivity = false;
-  let keyboardActivityStatus;
+  let keyboardActivityStatus = 'Someone is typing';
 
-  const socket = io('/chatrooms');
+  const socket = io($app.config.namespace);
 
-  function handleChatReceive(event) {
-    socket.emit('chatreceive', event.detail);
+  function handleMessageSend(event) {
+    // user: { id, username, avatar, socketId }
+    // chat: { message: {content, time}, sender: <user>, receiver: <user> }
+    let chat = {
+      message: { content: event.detail, time: new Date() },
+      sender: $app.user,
+      receiver: $app.activeReceiver
+    };
+    let chats = $app.chats[chat.receiver.socketId] || [];
+    $app = {
+      ...$app,
+      chats: {
+        ...$app.chats,
+        [chat.receiver.socketId]: [...chats, chat]
+      }
+    };
+    socket.emit('messagesend', chat);
+  }
+
+  function handleUserAction(event) {
+    $app = { ...$app, users: event.users };
+  }
+
+  function handleSelectBuddy(event) {
+    let chats = $app.chats[event.detail.socketId] || [];
+    $app = {
+      ...$app,
+      activeReceiver: event.detail,
+      chats: { ...$app.chats, [event.detail.socketId]: chats }
+    };
   }
 
   function handleKeyboardActivity(event) {
     socket.emit('keyboardactivity', {
-      user: user,
-      socketId: selectedUser.socketId
+      sender: event.detail,
+      receiver: $app.activeReceiver
     });
   }
 
   function handlekeyboardActivityStop(event) {
     socket.emit('keyboardactivitystop', {
-      user: user,
-      socketId: user.socketId
+      sender: event.detail,
+      receiver: $app.activeReceiver
     });
   }
 
-  function handleUserAction(event) {
-    let everyone = Object.values(event.users);
-    users = everyone.filter(buddy => buddy.id !== user.id);
-    usersCount = everyone.length;
-  }
-
-  function handleSelectBuddy(event) {
-    selectedUser = event.detail;
-  }
-
-  socket.on('userleave', event => handleUserAction(event));
-
-  socket.on('userregister', registeredUser => {
-    user = registeredUser;
+  socket.on('userleave', event => {
+    handleUserAction(event);
   });
 
-  socket.on('userjoin', event => handleUserAction(event));
+  socket.on('userregister', registeredUser => {
+    $app = { ...$app, user: registeredUser };
+  });
+
+  socket.on('afteruserregister', event => handleUserAction(event));
 
   socket.on('messagereceive', chat => {
-    new Audio('./sounds/pling.mp3').play();
-    chats = [...chats, chat];
+    // user: { id, username, avatar, socketId }
+    // chat: { message: {content, time}, sender: <user>, receiver: <user> }
+    let chats = $app.chats[chat.sender.socketId] || [];
+    $app = {
+      ...$app,
+      activeReceiver: chat.sender,
+      chats: {
+        ...$app.chats,
+        [chat.sender.socketId]: [...chats, chat]
+      }
+    };
+    new Audio('./sounds/pop.mp3').play();
   });
 
   socket.on('keyboardactivity', event => {
-    keyboardActivityStatus = `${event.user.username} is typing`;
     keyboardActivity = true;
+    keyboardActivityStatus = `${event.sender.username} is typing`;
     clearTimeout(timeout);
-    timeout = setTimeout(() => (keyboardActivity = false), 1000);
+    timeout = setTimeout(
+      () => (keyboardActivity = false),
+      $app.config.keyboardActivityTimeOut
+    );
   });
 
   socket.on('keyboardactivitystop', event => {
@@ -74,33 +104,51 @@
   onMount(() => {
     fetch('https://randomuser.me/api/?nat=us,ca')
       .then(res => {
-        loading = false;
+        $app = { ...$app, isLoading: false };
         if (res.ok) {
           res
             .json()
             .then(res => {
               let fakeUser = res.results[0];
-              user = {
-                id: new Date().getTime(),
-                username: `${fakeUser.name.first} ${fakeUser.name.last}`,
-                avatar: fakeUser.picture.thumbnail
+              $app = {
+                ...$app,
+                user: {
+                  id: new Date().getTime(),
+                  username: `${fakeUser.name.first} ${fakeUser.name.last}`,
+                  avatar: fakeUser.picture.thumbnail
+                }
               };
-              socket.emit('userregister', user);
+              socket.emit('userregister', $app.user);
             })
             .catch(err => console.error(err));
         } else {
-          user = {
-            id: new Date().getTime(),
-            username: `John Doe`,
-            avatar: `./images/avatar-male.png`
+          $app = {
+            ...$app,
+            user: {
+              id: new Date().getTime(),
+              username: `John Doe`,
+              avatar: `./images/avatar-male.png`
+            }
           };
-          socket.emit('userregister', user);
+          socket.emit('userregister', $app.user);
         }
       })
       .catch(err => console.error(err));
   });
 
   onDestroy(() => clearInterval(timeout));
+
+  $: users = Object.values($app.users).filter(user => user.id !== $app.user.id);
+  $: usersCount = Object.values(users).length;
+
+  $: chatWindowProps = {
+    sender: $app.user,
+    receiver: $app.activeReceiver,
+    usersCount: usersCount,
+    chats: $app.chats[$app.activeReceiver.socketId],
+    keyboardActivity,
+    keyboardActivityStatus
+  };
 </script>
 
 <style>
@@ -191,29 +239,24 @@
   }
 </style>
 
-{#if loading}
+{#if $app.isLoading}
   <AjaxLoader />
 {:else}
   <div class="container">
     <section>
-      <ChatBuddiesWindow bind:users on:selectbuddy={handleSelectBuddy} />
+      <ChatBuddiesWindow {users} on:selectbuddy={handleSelectBuddy} />
     </section>
-    {#if typeof selectedUser !== 'undefined'}
+    {#if !_.isEmpty($app.activeReceiver)}
       <section>
         <ChatWindow
-          {user}
-          {selectedUser}
-          {usersCount}
-          bind:chats
-          bind:keyboardActivity
-          bind:keyboardActivityStatus
-          on:chatreceive={handleChatReceive}
+          {...chatWindowProps}
+          on:messagesend={handleMessageSend}
           on:keyboardactivity={handleKeyboardActivity}
           on:keyboardactivitystop={handlekeyboardActivityStop} />
       </section>
     {:else}
       <section class="home">
-        <Home {user} {usersCount} />
+        <Home bind:usersCount user={$app.user} />
       </section>
     {/if}
   </div>

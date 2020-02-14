@@ -1,8 +1,8 @@
 <script>
   import moment from 'moment';
 
-  export let chat = {};
-  export let user = {};
+  export let chat;
+  export let user;
 </script>
 
 <style>
@@ -40,7 +40,7 @@
     justify-content: flex-end;
   }
 
-  .chat-message.you .user {
+  .chat-message.you .sender {
     text-align: right;
   }
 
@@ -62,7 +62,7 @@
     flex-wrap: wrap;
   }
 
-  .chat .user {
+  .chat .sender {
     flex-basis: 100%;
     order: 1;
     width: 100%;
@@ -84,14 +84,18 @@
   }
 </style>
 
-<div class={chat.user.id === user.id ? 'chat-message you' : 'chat-message'}>
+<!--
+  user: { id, username, avatar, socketId }
+  chat: { message: {content, time}, sender: <user>, receiver: <user> }
+-->
+<div class={chat.sender.id === user.id ? 'chat-message you' : 'chat-message'}>
   <div class="chat">
-    {#if chat.user.id !== user.id}
-      <img src={chat.user.avatar} alt={chat.user.username} class="avatar" />
+    {#if chat.sender.id !== user.id}
+      <img src={chat.sender.avatar} alt={chat.sender.username} class="avatar" />
     {/if}
-    <div class="user">
+    <div class="sender">
       <span class="username">
-        {chat.user.id === user.id ? 'You' : chat.user.username}
+        {chat.sender.id === user.id ? 'You' : chat.sender.username}
       </span>
     </div>
     <div class="message">

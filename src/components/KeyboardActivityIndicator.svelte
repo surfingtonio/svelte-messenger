@@ -3,6 +3,7 @@
 
   export let keyboardActivity = false;
   export let keyboardActivityStatus = 'Someone is typing';
+
   let ellipsis = '';
   let interval;
 
