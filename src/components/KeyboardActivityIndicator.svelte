@@ -1,25 +1,26 @@
 <script>
   import { onDestroy } from 'svelte';
+  import _ from 'lodash';
 
   export let keyboardActivity = false;
-  export let keyboardActivityStatus = 'Someone is typing';
+  export let keyboardActivityStatus = 'User is typing';
 
   let ellipsis = '';
-  let interval;
+  let intervalId;
 
   function animateEllipsis() {
-    clearInterval(interval);
-    let c = 0;
+    clearInterval(intervalId);
+    let dots = 0;
     return setInterval(() => {
-      ellipsis = '.'.repeat(c >= 3 ? (c = 1) : ++c);
+      ellipsis = '.'.repeat(dots >= 3 ? (dots = 1) : ++dots);
     }, 400);
   }
 
   $: keyboardActivity
-    ? (interval = animateEllipsis())
-    : clearInterval(interval);
+    ? (intervalId = animateEllipsis())
+    : clearInterval(intervalId);
 
-  onDestroy(() => clearInterval(interval));
+  onDestroy(() => clearInterval(intervalId));
 </script>
 
 <style>

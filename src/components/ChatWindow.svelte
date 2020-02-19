@@ -9,24 +9,30 @@
   export let receiver;
   export let usersCount;
   export let chats = [];
-
   export let keyboardActivity = false;
-  export let keyboardActivityStatus;
 
   const dispatch = createEventDispatcher();
 
   function handleMessageSend(event) {
-    dispatch('messagesend', event.detail);
+    let chat = {
+      message: { content: event.detail, time: new Date() },
+      sender,
+      receiver
+    };
+    dispatch('messagesend', chat);
   }
 
   function handleKeyboardActivity(event) {
+    const data = { user: sender, socketId: receiver.socketId };
     event.detail.keyCode === 13
-      ? dispatch('keyboardactivitystop', sender)
-      : dispatch('keyboardactivity', sender);
+      ? dispatch('keyboardactivitystop', data)
+      : dispatch('keyboardactivity', data);
   }
 
+  $: disabled = !receiver.online;
   $: chatToolbarProps = { user: receiver, usersCount };
-  $: chatMessagesProps = { user: sender, chats };
+  $: chatMessagesProps = { user: sender, chats, disabled };
+  $: keyboardActivityStatus = `${receiver.first} ${receiver.last} is typing`;
 </script>
 
 <style>
@@ -49,6 +55,7 @@
 
   <section>
     <ChatControls
+      {disabled}
       on:keyboardactivity={handleKeyboardActivity}
       on:messagesend={handleMessageSend} />
   </section>

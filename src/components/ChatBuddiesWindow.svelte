@@ -4,8 +4,8 @@
   import ChatBuddies from './ChatBuddies.svelte';
 
   export let users = [];
+  export let selectedBuddyId;
 
-  let selectedUserId = 0;
   let filterText;
   let timeout;
 
@@ -14,12 +14,8 @@
   function filterUsers(users, text) {
     return users.filter(user => {
       const regex = RegExp(text, 'i');
-      return regex.test(user.username);
+      return regex.test(`${user.first} ${user.last}`);
     });
-  }
-
-  function handleSelectBuddy(event) {
-    dispatch('selectbuddy', event.detail);
   }
 
   function handleFilterUsers(event) {
@@ -55,8 +51,8 @@
   </section>
   <section>
     <ChatBuddies
-      bind:selectedUserId
+      bind:selectedUserId={selectedBuddyId}
       users={filteredUsers}
-      on:selectbuddy={handleSelectBuddy} />
+      on:selectbuddy />
   </section>
 </div>

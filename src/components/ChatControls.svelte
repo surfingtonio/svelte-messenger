@@ -1,6 +1,8 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
+  export let disabled = false;
+
   let message;
 
   const dispatch = createEventDispatcher();
@@ -38,6 +40,10 @@
     padding: var(--chat-input-padding-y) var(--chat-input-padding-x);
   }
 
+  .chat-controls :disabled {
+    background: #efefef;
+  }
+
   .chat-controls button {
     background: var(--component-secondary-background);
     border-radius: var(--component-border-radius);
@@ -53,6 +59,7 @@
     type="text"
     class="chat-input"
     placeholder="Type a message..."
+    {disabled}
     bind:value={message}
     on:keydown={handleKeydown} />
   <button type="submit" on:click|preventDefault={handleMessageSend}>

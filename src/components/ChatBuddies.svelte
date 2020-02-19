@@ -7,9 +7,9 @@
 
   const dispatch = createEventDispatcher();
 
-  function handleClick(user, e) {
+  function handleClick(user) {
     selectedUserId = user.id;
-    dispatch('selectbuddy', user);
+    dispatch('selectbuddy', selectedUserId);
   }
 </script>
 
@@ -25,7 +25,7 @@
 </style>
 
 <div class="chat-buddies">
-  {#each users as user}
+  {#each users as user (user.id)}
     <ChatBuddy
       {user}
       selected={user.id === selectedUserId}

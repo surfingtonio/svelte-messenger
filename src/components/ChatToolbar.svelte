@@ -56,7 +56,7 @@
     max-height: 100%;
   }
 
-  .chat-toolbar .user .username {
+  .chat-toolbar .user .fullname {
     font-size: 1.25rem;
     font-weight: 700;
     line-height: var(--chat-toolbar-height);
@@ -66,8 +66,8 @@
 
 <div class="chat-toolbar">
   <div class="user">
-    <img src={user.avatar} alt={user.username} class="avatar" />
-    <span class="username">{user.username}</span>
+    <img src={user.avatar} alt={`${user.first} ${user.last}`} class="avatar" />
+    <span class="fullname">{user.first} {user.last}</span>
   </div>
   <div class="controls">
     <div

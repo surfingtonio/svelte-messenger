@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 
 const app = express();
@@ -14,49 +15,43 @@ app.use(
   express.static(`${__dirname}/node_modules/@fortawesome/fontawesome-free`)
 );
 
+const usersCount = () => _.filter(users, { online: true }).length;
+
 nsp.on('connection', socket => {
   socket.on('disconnect', () => {
-    const user = users[socket.id];
-    if (typeof user === 'undefined') {
-      return;
-    }
+    let user = _.find(users, u => u.socketId === socket.id);
+    if (typeof user === 'undefined') return;
 
-    delete users[socket.id];
+    user = _.set(users, [user.id], { ...users[user.id], online: false });
     nsp.emit('userleave', { user, users });
 
-    console.log(
-      `${user.username} has left. There are ${
-        Object.keys(users).length
-      } user(s) in the room.`
-    );
+    console.log(`${user.first} ${user.last} left.`);
+    console.log(`There are ${usersCount()} user(s) in the room.`);
   });
 
   socket.on('userregister', user => {
-    const registeredUser = { ...user, socketId: socket.id };
-    users[socket.id] = registeredUser;
+    _.set(users, [user.id], {
+      ...user,
+      socketId: socket.id,
+      online: true
+    });
+    socket.emit('userregister', users[user.id]);
+    nsp.emit('afteruserregister', { userId: user.id, users });
 
-    socket.emit('userregister', registeredUser);
-    nsp.emit('afteruserregister', { socketId: socket.id, users });
-
-    console.log(
-      `${user.username} joined. There are ${
-        Object.keys(users).length
-      } user(s) in the room.`
-    );
+    console.log(`${user.first} ${user.last} joined.`);
+    console.log(`There are ${usersCount()} user(s) in the room.`);
   });
 
   socket.on('messagesend', data => {
-    // user: { id, username, avatar, socketId }
-    // chat: { message: {content, time}, sender: <user>, receiver: <user> }
     socket.to(data.receiver.socketId).emit('messagereceive', data);
   });
 
   socket.on('keyboardactivity', data => {
-    socket.to(data.receiver.socketId).emit('keyboardactivity', data);
+    socket.to(data.socketId).emit('keyboardactivity', data.user);
   });
 
   socket.on('keyboardactivitystop', data => {
-    socket.to(data.receiver.socketId).emit('keyboardactivitystop', data);
+    socket.to(data.socketId).emit('keyboardactivitystop', data.user);
   });
 });
 

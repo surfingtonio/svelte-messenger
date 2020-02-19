@@ -4,6 +4,7 @@
 
   export let user;
   export let chats = [];
+  export let disabled = false;
 
   let chatWindow;
 
@@ -26,6 +27,10 @@
     width: calc(var(--chat-item-max-width) - (var(--chat-item-padding-x) * 2));
   }
 
+  .chat-messages.disabled {
+    background: #efefef;
+  }
+
   ::-webkit-scrollbar {
     width: var(--scrollbar-width);
   }
@@ -46,7 +51,7 @@
   }
 </style>
 
-<div class="chat-messages" bind:this={chatWindow}>
+<div class="chat-messages" class:disabled bind:this={chatWindow}>
   {#each chats as chat}
     <ChatMessage {user} {chat} />
   {/each}

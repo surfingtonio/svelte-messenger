@@ -1,153 +1,127 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import _ from 'lodash';
   import app from './store.js';
   import io from 'socket.io-client';
-  import _ from 'lodash';
-  import Home from './components/Home.svelte';
+  import AjaxLoader from './components/AjaxLoader.svelte';
   import ChatBuddiesWindow from './components/ChatBuddiesWindow.svelte';
   import ChatWindow from './components/ChatWindow.svelte';
-  import AjaxLoader from './components/AjaxLoader.svelte';
+  import Home from './components/Home.svelte';
 
-  let chats;
-  let timeout;
-  let keyboardActivity = false;
-  let keyboardActivityStatus = 'Someone is typing';
-
+  let keyboardActivities = {};
+  let loading = true;
+  let selectedBuddyId = null;
   const socket = io($app.config.namespace);
 
-  function handleMessageSend(event) {
-    // user: { id, username, avatar, socketId }
-    // chat: { message: {content, time}, sender: <user>, receiver: <user> }
-    let chat = {
-      message: { content: event.detail, time: new Date() },
-      sender: $app.user,
-      receiver: $app.activeReceiver
-    };
-    let chats = $app.chats[chat.receiver.socketId] || [];
-    $app = {
-      ...$app,
-      chats: {
-        ...$app.chats,
-        [chat.receiver.socketId]: [...chats, chat]
-      }
-    };
-    socket.emit('messagesend', chat);
+  function appendToStore(store, key, data) {
+    const existingData = _.get($app, `${store}.${key}`, []);
+    return _.set($app, `${store}.${key}`, [...existingData, data]);
   }
 
-  function handleUserAction(event) {
-    $app = { ...$app, users: event.users };
+  function clearKeyboardTimeout(userId) {
+    let timeoutId = _.get(keyboardActivities, `${userId}.timeoutId`, null);
+    if (timeoutId) clearTimeout(timeoutId);
+    keyboardActivities = _.set(keyboardActivities, `${userId}`, null);
   }
+
+  function clearAllKeyboardTimeouts() {
+    const timeoutIds = _.map(keyboardActivities, 'timeoutId');
+    return _.map(timeoutIds, clearTimeout);
+  }
+
+  async function fetchUser() {
+    return await fetch('https://randomuser.me/api/?nat=us,ca')
+      .then(handleErrors)
+      .then(res =>
+        res.json().then(res => ({
+          id: new Date().getTime(),
+          first: res.results[0].name.first,
+          last: res.results[0].name.last,
+          username: res.results[0].login.username,
+          avatar: res.results[0].picture.thumbnail,
+          online: false
+        }))
+      );
+  }
+
+  function handleErrors(res) {
+    if (!res.ok) throw Error(res.statusText);
+    return res;
+  }
+
+  onMount(async () => {
+    const user = await fetchUser();
+    $app = _.set($app, 'user', user);
+    loading = false;
+    socket.emit('userregister', user);
+  });
+
+  onDestroy(() => clearAllKeyboardTimeouts());
 
   function handleSelectBuddy(event) {
-    let chats = $app.chats[event.detail.socketId] || [];
-    $app = {
-      ...$app,
-      activeReceiver: event.detail,
-      chats: { ...$app.chats, [event.detail.socketId]: chats }
-    };
+    selectedBuddyId = event.detail;
+  }
+
+  function handleMessageSend(event) {
+    $app = appendToStore('chats', event.detail.receiver.id, event.detail);
+    socket.emit('messagesend', event.detail);
   }
 
   function handleKeyboardActivity(event) {
     socket.emit('keyboardactivity', {
-      sender: event.detail,
-      receiver: $app.activeReceiver
+      user: event.detail.user,
+      socketId: event.detail.socketId
     });
   }
 
   function handlekeyboardActivityStop(event) {
     socket.emit('keyboardactivitystop', {
-      sender: event.detail,
-      receiver: $app.activeReceiver
+      user: event.detail.user,
+      socketId: event.detail.socketId
     });
   }
 
+  socket.on('afteruserregister', event => {
+    $app = _.set($app, 'users', event.users);
+  });
+
+  socket.on('keyboardactivity', user => {
+    clearKeyboardTimeout(user.id);
+    let timeoutId = setTimeout(() => clearKeyboardTimeout(user.id), 1000);
+    keyboardActivities = _.set(keyboardActivities, `${user.id}`, { timeoutId });
+  });
+
+  socket.on('keyboardactivitystop', user => {
+    clearKeyboardTimeout(user.id);
+  });
+
   socket.on('userleave', event => {
-    handleUserAction(event);
+    $app = _.set($app, 'users', event.users);
   });
 
-  socket.on('userregister', registeredUser => {
-    $app = { ...$app, user: registeredUser };
+  socket.on('userregister', user => {
+    $app = _.set($app, 'user', user);
   });
-
-  socket.on('afteruserregister', event => handleUserAction(event));
 
   socket.on('messagereceive', chat => {
-    // user: { id, username, avatar, socketId }
-    // chat: { message: {content, time}, sender: <user>, receiver: <user> }
-    let chats = $app.chats[chat.sender.socketId] || [];
-    $app = {
-      ...$app,
-      activeReceiver: chat.sender,
-      chats: {
-        ...$app.chats,
-        [chat.sender.socketId]: [...chats, chat]
-      }
-    };
+    $app = appendToStore('chats', chat.sender.id, chat);
     new Audio('./sounds/pop.mp3').play();
   });
 
-  socket.on('keyboardactivity', event => {
-    keyboardActivity = true;
-    keyboardActivityStatus = `${event.sender.username} is typing`;
-    clearTimeout(timeout);
-    timeout = setTimeout(
-      () => (keyboardActivity = false),
-      $app.config.keyboardActivityTimeOut
-    );
-  });
-
-  socket.on('keyboardactivitystop', event => {
-    keyboardActivity = false;
-    clearTimeout(timeout);
-  });
-
-  onMount(() => {
-    fetch('https://randomuser.me/api/?nat=us,ca')
-      .then(res => {
-        $app = { ...$app, isLoading: false };
-        if (res.ok) {
-          res
-            .json()
-            .then(res => {
-              let fakeUser = res.results[0];
-              $app = {
-                ...$app,
-                user: {
-                  id: new Date().getTime(),
-                  username: `${fakeUser.name.first} ${fakeUser.name.last}`,
-                  avatar: fakeUser.picture.thumbnail
-                }
-              };
-              socket.emit('userregister', $app.user);
-            })
-            .catch(err => console.error(err));
-        } else {
-          $app = {
-            ...$app,
-            user: {
-              id: new Date().getTime(),
-              username: `John Doe`,
-              avatar: `./images/avatar-male.png`
-            }
-          };
-          socket.emit('userregister', $app.user);
-        }
-      })
-      .catch(err => console.error(err));
-  });
-
-  onDestroy(() => clearInterval(timeout));
-
-  $: users = Object.values($app.users).filter(user => user.id !== $app.user.id);
-  $: usersCount = Object.values(users).length;
-
+  $: user = _.get($app, 'user', null);
+  $: users = _.get($app, 'users', null);
+  $: chats = _.get($app, `chats.${selectedBuddyId}`, []);
+  $: receiver = _.get($app, `users.${selectedBuddyId}`, null);
+  $: keyboardActivityTimeOut = _.get($app, 'keyboardActivityTimeOut', 1000);
+  $: buddies = _.filter(users, buddy => buddy.online && buddy.id !== user.id);
+  $: usersCount = buddies.length;
+  $: keyboardActivity = _.get(keyboardActivities, selectedBuddyId, null);
   $: chatWindowProps = {
-    sender: $app.user,
-    receiver: $app.activeReceiver,
-    usersCount: usersCount,
-    chats: $app.chats[$app.activeReceiver.socketId],
-    keyboardActivity,
-    keyboardActivityStatus
+    sender: user,
+    receiver,
+    usersCount,
+    chats,
+    keyboardActivity: !_.isNull(keyboardActivity)
   };
 </script>
 
@@ -239,24 +213,27 @@
   }
 </style>
 
-{#if $app.isLoading}
+{#if loading}
   <AjaxLoader />
 {:else}
   <div class="container">
     <section>
-      <ChatBuddiesWindow {users} on:selectbuddy={handleSelectBuddy} />
+      <ChatBuddiesWindow
+        users={buddies}
+        bind:selectedBuddyId
+        on:selectbuddy={handleSelectBuddy} />
     </section>
-    {#if !_.isEmpty($app.activeReceiver)}
+    {#if selectedBuddyId === null}
+      <section class="home">
+        <Home bind:usersCount {user} />
+      </section>
+    {:else}
       <section>
         <ChatWindow
           {...chatWindowProps}
           on:messagesend={handleMessageSend}
           on:keyboardactivity={handleKeyboardActivity}
           on:keyboardactivitystop={handlekeyboardActivityStop} />
-      </section>
-    {:else}
-      <section class="home">
-        <Home bind:usersCount user={$app.user} />
       </section>
     {/if}
   </div>

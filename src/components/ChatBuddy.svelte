@@ -17,7 +17,7 @@
     margin-right: 0.75rem;
   }
 
-  .chat-buddy .user {
+  .chat-buddy .fullname {
     font-weight: 700;
     font-size: 0.9rem;
   }
@@ -28,6 +28,6 @@
 </style>
 
 <div class="chat-buddy" class:selected on:click>
-  <img src={user.avatar} alt={user.username} class="avatar" />
-  <div class="user">{user.username}</div>
+  <img src={user.avatar} alt="`${user.first} ${user.last}`" class="avatar" />
+  <div class="fullname">{user.first} {user.last}</div>
 </div>

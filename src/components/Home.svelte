@@ -35,7 +35,7 @@
   <div class="welcome">
     <p class="greeting">
       Hi
-      <span>{user.username}</span>
+      <span>{user.first} {user.last}</span>
     </p>
     {#if usersCount > 0}
       <p>Select a user on the left to start chatting.</p>

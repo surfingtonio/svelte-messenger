@@ -15,7 +15,7 @@
     max-width: 500px;
   }
 
-  .chat-message .username {
+  .chat-message .fullname {
     color: var(--component-secondary-color);
     font-size: var(--component-small-font);
   }
@@ -84,18 +84,17 @@
   }
 </style>
 
-<!--
-  user: { id, username, avatar, socketId }
-  chat: { message: {content, time}, sender: <user>, receiver: <user> }
--->
 <div class={chat.sender.id === user.id ? 'chat-message you' : 'chat-message'}>
   <div class="chat">
     {#if chat.sender.id !== user.id}
-      <img src={chat.sender.avatar} alt={chat.sender.username} class="avatar" />
+      <img
+        src={chat.sender.avatar}
+        alt={`${chat.sender.first} ${chat.sender.last}`}
+        class="avatar" />
     {/if}
     <div class="sender">
-      <span class="username">
-        {chat.sender.id === user.id ? 'You' : chat.sender.username}
+      <span class="fullname">
+        {chat.sender.id === user.id ? 'You' : `${chat.sender.first} ${chat.sender.first}`}
       </span>
     </div>
     <div class="message">

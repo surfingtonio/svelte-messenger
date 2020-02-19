@@ -5,8 +5,6 @@ const app = writable({
     namespace: '/chatrooms',
     keyboardActivityTimeOut: 1000
   },
-  isLoading: true,
-  activeReceiver: {},
   user: {},
   users: {},
   chats: {}
