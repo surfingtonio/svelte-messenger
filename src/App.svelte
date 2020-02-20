@@ -104,6 +104,7 @@
   });
 
   socket.on('messagereceive', chat => {
+    selectedBuddyId = selectedBuddyId || chat.sender.id;
     $app = appendToStore('chats', chat.sender.id, chat);
     new Audio('./sounds/pop.mp3').play();
   });
