@@ -94,7 +94,7 @@
     {/if}
     <div class="sender">
       <span class="fullname">
-        {chat.sender.id === user.id ? 'You' : `${chat.sender.first} ${chat.sender.first}`}
+        {chat.sender.id === user.id ? 'You' : `${chat.sender.first} ${chat.sender.last}`}
       </span>
     </div>
     <div class="message">
