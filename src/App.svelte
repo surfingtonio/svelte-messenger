@@ -128,62 +128,76 @@
 
 <style>
   :global(:root) {
-    --chat-controls-height: 3rem;
-    --chat-controls-padding-x: 0.25rem;
-    --chat-controls-padding-y: 0.25rem;
-    --chat-input-padding-x: 0.25rem;
-    --chat-input-padding-y: 0.5rem;
-    --chat-item-margin: 0.5rem 0;
-    --chat-item-padding-x: 1rem;
-    --chat-item-padding-y: 0;
-    --chat-items-max-width: 100vw;
-    --chat-items-min-width: 480px;
-    --chat-toolbar-height: 3rem;
-    --chat-toolbar-padding-x: 1rem;
-    --chat-toolbar-padding-y: 0.5rem;
-    --component-border-radius: 0.25rem;
-    --component-border-width: 1px;
-    --component-line-color: #e4e9f2;
-    --component-max-height: 100%;
-    --component-max-width: 100%;
-    --component-min-width: 480px;
-    --component-primary-background: #fff;
-    --component-primary-color: #101010;
-    --component-secondary-background: #f5f6f8;
-    --component-secondary-color: #97a4b2;
-    --component-small-font: 0.75rem;
-    --component-theme-background: #7360f2;
-    --message-border-radius: 1rem;
-    --message-max-width: 30rem;
-    --message-other-color: #efefef;
-    --message-padding-x: 1rem;
-    --message-padding-y: 0.5rem;
-    --message-you-color: #d8ebff;
-    --scrollbar-thumb-border-radius: 0.2rem;
-    --scrollbar-thumb-color: rgba(228, 228, 228, 0.5);
-    --scrollbar-thumb-hover-color: rgba(228, 228, 228, 1);
-    --scrollbar-track-background: transparent;
-    --scrollbar-width: 0.5rem;
-    --toolbar-separator-width: 0.25rem;
+    /* Brand */
+    --brand-primary: #6c63ff;
+    --brand-primary-dark: #5a52e0;
+    --brand-primary-light: rgba(108, 99, 255, 0.1);
+
+    /* Backgrounds */
+    --bg-app: #f0f2f7;
+    --bg-sidebar: #ffffff;
+    --bg-chat: #f0f2f7;
+    --bg-card: #ffffff;
+    --bg-input: #f0f2f7;
+    --bg-message-out: #6c63ff;
+    --bg-message-in: #ffffff;
+    --bg-disabled: #f5f5f5;
+
+    /* Text */
+    --text-primary: #1a1a2e;
+    --text-secondary: #8896ab;
+    --text-muted: #aab4be;
+    --text-inverse: #ffffff;
+    --text-brand: #6c63ff;
+
+    /* Borders */
+    --border-color: #e8ecf0;
+    --border-radius-sm: 0.375rem;
+    --border-radius: 0.75rem;
+    --border-radius-lg: 1.25rem;
+    --border-radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    /* Status */
+    --color-online: #22c55e;
+    --color-offline: #cbd5e1;
+
+    /* Sizing */
+    --sidebar-width: 20rem;
+    --toolbar-height: 4rem;
+    --controls-height: 4rem;
+    --avatar-sm: 2rem;
+    --avatar-md: 2.5rem;
+    --avatar-lg: 3rem;
+
+    /* Transitions */
+    --transition: 0.15s ease;
+    --transition-slow: 0.25s ease;
+  }
+
+  :global(*, *::before, *::after) {
+    box-sizing: border-box;
   }
 
   :global(::-webkit-scrollbar) {
-    width: var(--scrollbar-width);
+    width: 4px;
   }
 
   :global(::-webkit-scrollbar-track) {
-    background: var(--scrollbar-track-background);
+    background: transparent;
   }
 
   :global(::-webkit-scrollbar-thumb) {
-    background: var(--scrollbar-thumb-color);
-    border-radius: var(--scrollbar-thumb-border-radius);
-    opacity: 0.1;
+    background: var(--border-color);
+    border-radius: var(--border-radius-full);
   }
 
   :global(::-webkit-scrollbar-thumb:hover) {
-    background: var(--scrollbar-thumb-hover-color);
-    opacity: 1;
+    background: var(--text-muted);
   }
 
   .not-supported {
@@ -192,10 +206,11 @@
 
   .container {
     display: grid;
-    grid-template-columns: 18rem auto;
-    grid-template-rows: minmax(0, 100vh) auto;
+    grid-template-columns: var(--sidebar-width) 1fr;
     height: 100vh;
     width: 100vw;
+    overflow: hidden;
+    background: var(--bg-app);
   }
 
   @media (max-width: 319px), (max-height: 319px) {
@@ -218,24 +233,19 @@
   <AjaxLoader />
 {:else}
   <div class="container">
-    <section>
-      <ChatBuddiesWindow
-        users={buddies}
-        bind:selectedBuddyId
-        on:selectbuddy={handleSelectBuddy} />
-    </section>
+    <ChatBuddiesWindow
+      users={buddies}
+      {user}
+      bind:selectedBuddyId
+      on:selectbuddy={handleSelectBuddy} />
     {#if selectedBuddyId === null}
-      <section class="home">
-        <Home bind:usersCount {user} />
-      </section>
+      <Home bind:usersCount {user} />
     {:else}
-      <section>
-        <ChatWindow
-          {...chatWindowProps}
-          on:messagesend={handleMessageSend}
-          on:keyboardactivity={handleKeyboardActivity}
-          on:keyboardactivitystop={handlekeyboardActivityStop} />
-      </section>
+      <ChatWindow
+        {...chatWindowProps}
+        on:messagesend={handleMessageSend}
+        on:keyboardactivity={handleKeyboardActivity}
+        on:keyboardactivitystop={handlekeyboardActivityStop} />
     {/if}
   </div>
 {/if}

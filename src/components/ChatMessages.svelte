@@ -18,36 +18,18 @@
 
 <style>
   .chat-messages {
-    flex-direction: column;
+    flex: 1;
     display: flex;
-    height: 100%;
+    flex-direction: column;
     overflow-x: hidden;
-    overflow-y: scroll;
-    padding: var(--chat-item-padding-y) var(--chat-item-padding-x);
-    width: calc(var(--chat-item-max-width) - (var(--chat-item-padding-x) * 2));
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem;
+    gap: 0.25rem;
   }
 
   .chat-messages.disabled {
-    background: #efefef;
-  }
-
-  ::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--scrollbar-track-background);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb-color);
-    border-radius: var(--scrollbar-thumb-border-radius);
-    opacity: 0.1;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover-color);
-    opacity: 1;
+    opacity: 0.6;
+    pointer-events: none;
   }
 </style>
 

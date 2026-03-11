@@ -5,29 +5,81 @@
 
 <style>
   .chat-buddy {
-    align-items: center;
-    border-bottom: 1px solid var(--component-line-color);
-    cursor: pointer;
     display: flex;
-    padding: 0.5rem 1rem;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background var(--transition);
+    position: relative;
   }
 
-  .chat-buddy .avatar {
-    border-radius: 40%;
-    margin-right: 0.75rem;
-  }
-
-  .chat-buddy .fullname {
-    font-weight: 700;
-    font-size: 0.9rem;
+  .chat-buddy:hover {
+    background: var(--bg-input);
   }
 
   .chat-buddy.selected {
-    background: #edf4f6;
+    background: var(--brand-primary-light);
+  }
+
+  .avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: var(--avatar-md);
+    height: var(--avatar-md);
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .online-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0.625rem;
+    height: 0.625rem;
+    background: var(--color-online);
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  .info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .fullname {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-buddy.selected .fullname {
+    color: var(--brand-primary);
+  }
+
+  .status {
+    font-size: 0.7rem;
+    color: var(--color-online);
+    font-weight: 500;
+    margin-top: 0.1rem;
   }
 </style>
 
 <div class="chat-buddy" class:selected on:click>
-  <img src={user.avatar} alt="`${user.first} ${user.last}`" class="avatar" />
-  <div class="fullname">{user.first} {user.last}</div>
+  <div class="avatar-wrap">
+    <img src={user.avatar} alt="{user.first} {user.last}" class="avatar" />
+    <span class="online-dot" />
+  </div>
+  <div class="info">
+    <div class="fullname">{user.first} {user.last}</div>
+    <div class="status">Online</div>
+  </div>
 </div>

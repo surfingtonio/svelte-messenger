@@ -32,31 +32,35 @@
   $: disabled = !receiver.online;
   $: chatToolbarProps = { user: receiver, usersCount };
   $: chatMessagesProps = { user: sender, chats, disabled };
-  $: keyboardActivityStatus = `${receiver.first} ${receiver.last} is typing`;
+  $: keyboardActivityStatus = `${receiver.first} is typing`;
 </script>
 
 <style>
   .chat-window {
     display: grid;
-    grid-template-rows: 4rem minmax(0, 100vh) 4rem;
+    grid-template-rows: var(--toolbar-height) 1fr auto;
     height: 100vh;
+    background: var(--bg-chat);
+    overflow: hidden;
+  }
+
+  .messages-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
   }
 </style>
 
 <div class="chat-window">
-  <section>
-    <ChatToolbar {...chatToolbarProps} />
-  </section>
-
-  <section>
+  <ChatToolbar {...chatToolbarProps} />
+  <div class="messages-area">
     <ChatMessages {...chatMessagesProps} />
     <KeyboardActivityIndicator bind:keyboardActivity {keyboardActivityStatus} />
-  </section>
-
-  <section>
-    <ChatControls
-      {disabled}
-      on:keyboardactivity={handleKeyboardActivity}
-      on:messagesend={handleMessageSend} />
-  </section>
+  </div>
+  <ChatControls
+    {disabled}
+    on:keyboardactivity={handleKeyboardActivity}
+    on:messagesend={handleMessageSend} />
 </div>

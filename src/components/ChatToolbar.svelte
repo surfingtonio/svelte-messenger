@@ -4,77 +4,100 @@
 </script>
 
 <style>
-  :root {
-    --online-color: #73c538;
-  }
-
   .chat-toolbar {
-    background: var(--component-secondary-background);
     display: flex;
-    height: calc(100% - (var(--chat-toolbar-padding-y) * 2));
-    justify-content: space-between;
-    padding: var(--chat-toolbar-padding-y) var(--chat-toolbar-padding-x);
-    width: calc(100% - (var(--chat-toolbar-padding-x) * 2));
-  }
-
-  .chat-toolbar .controls {
     align-items: center;
-    display: flex;
-    font-size: 1.5rem;
     justify-content: space-between;
+    padding: 0.875rem 1.25rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    height: var(--toolbar-height);
   }
 
-  .chat-toolbar .online-users {
-    color: var(--component-theme-background);
+  .user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
-  .chat-toolbar .online-users span {
-    background: var(--online-color);
+  .avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: var(--avatar-md);
+    height: var(--avatar-md);
     border-radius: 50%;
-    border: 1px solid var(--online-color);
-    color: #fff;
-    display: inline-block;
-    font-size: 0.5rem;
-    font-weight: 700;
-    height: 0.5rem;
-    line-height: 0.5rem;
-    margin: 0 0 -0.7rem -0.7rem;
-    padding: 0.166rem;
-    text-align: center;
-    vertical-align: middle;
-    width: 0.5rem;
+    object-fit: cover;
+    display: block;
   }
 
-  .chat-toolbar .user {
-    align-items: center;
+  .online-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0.625rem;
+    height: 0.625rem;
+    background: var(--color-online);
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  .user-info .name {
+    font-weight: 700;
+    font-size: 0.9375rem;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .user-info .status {
+    font-size: 0.75rem;
+    color: var(--color-online);
+    font-weight: 500;
+  }
+
+  .controls {
     display: flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 
-  .chat-toolbar .user .avatar {
-    border-radius: 40%;
-    margin-right: 0.75rem;
-    max-height: 100%;
+  .online-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--border-radius-full);
   }
 
-  .chat-toolbar .user .fullname {
-    font-size: 1.25rem;
-    font-weight: 700;
-    line-height: var(--chat-toolbar-height);
-    white-space: nowrap;
+  .online-badge i {
+    font-size: 0.7rem;
   }
 </style>
 
 <div class="chat-toolbar">
   <div class="user">
-    <img src={user.avatar} alt={`${user.first} ${user.last}`} class="avatar" />
-    <span class="fullname">{user.first} {user.last}</span>
+    <div class="avatar-wrap">
+      <img src={user.avatar} alt="{user.first} {user.last}" class="avatar" />
+      <span class="online-dot" />
+    </div>
+    <div class="user-info">
+      <div class="name">{user.first} {user.last}</div>
+      <div class="status">Online</div>
+    </div>
   </div>
   <div class="controls">
     <div
-      class="online-users"
-      title="{usersCount} online {usersCount === 1 ? 'user' : 'users'}">
+      class="online-badge"
+      title="{usersCount} online {usersCount === 1 ? 'user' : 'users'}"
+    >
       <i class="fas fa-users" />
-      <span class="usersCount">{usersCount}</span>
+      {usersCount} online
     </div>
   </div>
 </div>
