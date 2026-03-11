@@ -1,44 +1,96 @@
 <script>
   import { onDestroy } from 'svelte';
-  import _ from 'lodash';
 
   export let keyboardActivity = false;
   export let keyboardActivityStatus = 'User is typing';
 
-  let ellipsis = '';
   let intervalId;
+  let dotCount = 1;
 
-  function animateEllipsis() {
+  function startAnimation() {
     clearInterval(intervalId);
-    let dots = 0;
-    return setInterval(() => {
-      ellipsis = '.'.repeat(dots >= 3 ? (dots = 1) : ++dots);
+    dotCount = 1;
+    intervalId = setInterval(() => {
+      dotCount = dotCount >= 3 ? 1 : dotCount + 1;
     }, 400);
   }
 
-  $: keyboardActivity
-    ? (intervalId = animateEllipsis())
-    : clearInterval(intervalId);
+  $: if (keyboardActivity) {
+    startAnimation();
+  } else {
+    clearInterval(intervalId);
+  }
 
   onDestroy(() => clearInterval(intervalId));
+
+  $: dots = '.'.repeat(dotCount);
 </script>
 
 <style>
-  .keyboard-activity {
-    background: var(--component-secondary-background);
-    border-radius: var(--component-border-radius);
-    color: var(--component-primary-color);
-    font-size: var(--component-small-font);
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 1rem 0.5rem;
+    min-height: 1.75rem;
+  }
+
+  .typing-bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: white;
+    border-radius: var(--border-radius-full, 9999px);
+    padding: 0.375rem 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    font-size: 0.75rem;
+    color: #8896ab;
     font-style: italic;
-    padding: var(--chat-controls-padding-x)
-      calc(var(--chat-controls-padding-x) * 2);
-    position: fixed;
-    opacity: 0.75;
-    margin-top: calc((1rem + var(--chat-controls-padding-x) * 2) * -1);
-    z-index: 99;
+  }
+
+  .dots {
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+  }
+
+  .dot {
+    width: 0.3rem;
+    height: 0.3rem;
+    background: #8896ab;
+    border-radius: 50%;
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+
+  .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes bounce {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-3px);
+    }
   }
 </style>
 
 {#if keyboardActivity}
-  <span class="keyboard-activity">{keyboardActivityStatus}{ellipsis}</span>
+  <div class="typing-indicator">
+    <div class="typing-bubble">
+      <span>{keyboardActivityStatus}</span>
+      <div class="dots">
+        <div class="dot" />
+        <div class="dot" />
+        <div class="dot" />
+      </div>
+    </div>
+  </div>
 {/if}

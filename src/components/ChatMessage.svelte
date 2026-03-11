@@ -3,103 +3,110 @@
 
   export let chat;
   export let user;
+
+  $: isYou = chat.sender.id === user.id;
 </script>
 
 <style>
   .chat-message {
     display: flex;
-    padding-bottom: 0.5rem;
-  }
-
-  .chat-message .chat {
-    max-width: 500px;
-  }
-
-  .chat-message .fullname {
-    color: var(--component-secondary-color);
-    font-size: var(--component-small-font);
-  }
-
-  .chat-message .message {
-    background: var(--message-other-color);
-    border-radius: 0 var(--message-border-radius) var(--message-border-radius)
-      var(--message-border-radius);
-    padding: var(--message-padding-y) var(--message-padding-x);
-    word-break: break-word;
-  }
-
-  .chat-message .message .time {
-    color: var(--component-secondary-color);
-    display: block;
-    font-size: var(--component-small-font);
-    padding-top: 0.25rem;
-    text-align: right;
+    align-items: flex-end;
+    gap: 0.5rem;
+    max-width: 70%;
+    margin-bottom: 0.125rem;
   }
 
   .chat-message.you {
-    justify-content: flex-end;
+    align-self: flex-end;
+    flex-direction: row-reverse;
   }
 
-  .chat-message.you .sender {
-    text-align: right;
+  .chat-message.other {
+    align-self: flex-start;
   }
 
-  .chat-message.you .message {
-    background: var(--message-you-color);
-    border-radius: var(--message-border-radius) 0 var(--message-border-radius)
-      var(--message-border-radius);
+  .avatar {
+    width: var(--avatar-sm);
+    height: var(--avatar-sm);
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-bottom: 0.25rem;
   }
 
-  @media (max-width: 600px) {
-    .chat-message .chat {
-      max-width: 100%;
-    }
-  }
-
-  .chat {
-    align-items: flex-start;
+  .bubble-wrap {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.125rem;
   }
 
-  .chat .sender {
-    flex-basis: 100%;
-    order: 1;
-    width: 100%;
+  .you .bubble-wrap {
+    align-items: flex-end;
   }
 
-  .chat .avatar {
-    border-radius: 40%;
-    flex-basis: auto;
-    flex: 0;
-    height: 2rem;
-    margin-right: 0.25rem;
-    order: 2;
+  .other .bubble-wrap {
+    align-items: flex-start;
   }
 
-  .chat .message {
-    flex-basis: auto;
-    flex: 1;
-    order: 3;
+  .sender-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0 0.5rem;
+  }
+
+  .bubble {
+    padding: 0.625rem 0.9rem;
+    border-radius: 1.125rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    word-break: break-word;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .you .bubble {
+    background: var(--bg-message-out);
+    color: var(--text-inverse);
+    border-bottom-right-radius: 0.25rem;
+  }
+
+  .other .bubble {
+    background: var(--bg-message-in);
+    color: var(--text-primary);
+    border-bottom-left-radius: 0.25rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .time {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    display: block;
+    margin-top: 0.25rem;
+    padding: 0 0.5rem;
+    color: var(--text-muted);
+  }
+
+  .you .time {
+    text-align: right;
   }
 </style>
 
-<div class={chat.sender.id === user.id ? 'chat-message you' : 'chat-message'}>
-  <div class="chat">
-    {#if chat.sender.id !== user.id}
-      <img
-        src={chat.sender.avatar}
-        alt={`${chat.sender.first} ${chat.sender.last}`}
-        class="avatar" />
+<div class="chat-message" class:you={isYou} class:other={!isYou}>
+  {#if !isYou}
+    <img
+      src={chat.sender.avatar}
+      alt="{chat.sender.first} {chat.sender.last}"
+      class="avatar"
+    />
+  {/if}
+  <div class="bubble-wrap">
+    {#if !isYou}
+      <span class="sender-name">{chat.sender.first}</span>
     {/if}
-    <div class="sender">
-      <span class="fullname">
-        {chat.sender.id === user.id ? 'You' : `${chat.sender.first} ${chat.sender.last}`}
-      </span>
+    <div class="bubble">
+      {chat.message.content}
     </div>
-    <div class="message">
-      <span class="content">{chat.message.content}</span>
-      <span class="time">{moment(chat.message.time).format('h:mm:ss a')}</span>
-    </div>
+    <span class="time">{moment(chat.message.time).format('h:mm a')}</span>
   </div>
 </div>

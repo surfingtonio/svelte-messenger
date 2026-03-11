@@ -3,66 +3,126 @@
 
   export let disabled = false;
 
-  let message;
+  let message = '';
 
   const dispatch = createEventDispatcher();
 
-  function handleMessageSend(event) {
-    message = message.trim();
-    if (message !== '') {
-      dispatch('messagesend', message);
+  function handleMessageSend() {
+    const trimmed = message.trim();
+    if (trimmed !== '') {
+      dispatch('messagesend', trimmed);
       message = '';
     }
   }
 
   function handleKeydown(event) {
     dispatch('keyboardactivity', event);
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleMessageSend();
+    }
   }
 </script>
 
 <style>
   .chat-controls {
-    background: var(--component-secondary-background);
     display: flex;
-    height: calc(100% - (var(--chat-controls-padding-y) * 2));
-    margin: 0;
-    padding: var(--chat-controls-padding-y) var(--chat-controls-padding-x);
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1.25rem;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
   }
 
-  .chat-controls .chat-input {
-    background: var(--component-primary-background);
-    border-radius: var(--component-border-radius);
-    border: var(--component-border-width) solid var(--component-line-color);
-    color: var(--component-primary-color);
-    flex: 2;
-    margin-right: var(--toolbar-separator-width);
+  .input-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .chat-input {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--border-radius-full);
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text-primary);
     outline: none;
-    padding: var(--chat-input-padding-y) var(--chat-input-padding-x);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    resize: none;
   }
 
-  .chat-controls :disabled {
-    background: #efefef;
+  .chat-input::placeholder {
+    color: var(--text-muted);
   }
 
-  .chat-controls button {
-    background: var(--component-secondary-background);
-    border-radius: var(--component-border-radius);
-    border: 1px solid var(--component-line-color);
-    color: var(--component-primary-color);
+  .chat-input:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px var(--brand-primary-light);
+    background: white;
+  }
+
+  .chat-input:disabled {
+    background: var(--bg-disabled);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .send-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--brand-primary);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1rem;
     cursor: pointer;
-    padding: 0 1rem;
+    transition: background var(--transition), transform var(--transition),
+      box-shadow var(--transition);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(108, 99, 255, 0.4);
+  }
+
+  .send-btn:hover:not(:disabled) {
+    background: var(--brand-primary-dark);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.5);
+  }
+
+  .send-btn:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  .send-btn:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    box-shadow: none;
   }
 </style>
 
-<form class="chat-controls">
-  <input
-    type="text"
-    class="chat-input"
-    placeholder="Type a message..."
+<div class="chat-controls">
+  <div class="input-wrap">
+    <input
+      type="text"
+      class="chat-input"
+      placeholder={disabled ? 'User is offline' : 'Type a message…'}
+      {disabled}
+      bind:value={message}
+      on:keydown={handleKeydown}
+    />
+  </div>
+  <button
+    class="send-btn"
     {disabled}
-    bind:value={message}
-    on:keydown={handleKeydown} />
-  <button type="submit" on:click|preventDefault={handleMessageSend}>
-    Send
+    on:click|preventDefault={handleMessageSend}
+    title="Send message"
+  >
+    <i class="fas fa-paper-plane" />
   </button>
-</form>
+</div>
