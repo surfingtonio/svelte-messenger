@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/server.js",
+      "env": {
+        "PORT": "4000"
+      },
+      "console": "integratedTerminal",
+      "restart": true
+    },
+    {
+      "name": "Frontend (dev)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "Your application is ready",
+        "uriFormat": "http://localhost:5000"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Server + Frontend",
+      "configurations": ["Server", "Frontend (dev)"]
+    }
+  ]
+}
