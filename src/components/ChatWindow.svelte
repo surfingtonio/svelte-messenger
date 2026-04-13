@@ -1,29 +1,34 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import ChatToolbar from './ChatToolbar.svelte';
   import ChatMessages from './ChatMessages.svelte';
   import ChatControls from './ChatControls.svelte';
   import KeyboardActivityIndicator from './KeyboardActivityIndicator.svelte';
+  import type { User, ChatMsg } from '../types';
 
-  export let sender;
-  export let receiver;
-  export let usersCount;
-  export let chats = [];
-  export let keyboardActivity = false;
+  export let sender: User;
+  export let receiver: User;
+  export let usersCount: number;
+  export let chats: ChatMsg[] = [];
+  export let keyboardActivity: boolean = false;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    messagesend: ChatMsg;
+    keyboardactivity: { user: User; socketId: string };
+    keyboardactivitystop: { user: User; socketId: string };
+  }>();
 
-  function handleMessageSend(event) {
-    let chat = {
+  function handleMessageSend(event: CustomEvent<string>) {
+    const chat: ChatMsg = {
       message: { content: event.detail, time: new Date() },
       sender,
-      receiver
+      receiver,
     };
     dispatch('messagesend', chat);
   }
 
-  function handleKeyboardActivity(event) {
-    const data = { user: sender, socketId: receiver.socketId };
+  function handleKeyboardActivity(event: CustomEvent<KeyboardEvent>) {
+    const data = { user: sender, socketId: receiver.socketId ?? '' };
     event.detail.keyCode === 13
       ? dispatch('keyboardactivitystop', data)
       : dispatch('keyboardactivity', data);

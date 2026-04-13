@@ -1,6 +1,9 @@
-<script>
-  export let user;
-  export let usersCount = 0;
+<script lang="ts">
+  import Avatar from './Avatar.svelte';
+  import type { User } from '../types';
+
+  export let user: User;
+  export let usersCount: number = 0;
 </script>
 
 <style>
@@ -23,14 +26,6 @@
   .avatar-wrap {
     position: relative;
     flex-shrink: 0;
-  }
-
-  .avatar {
-    width: var(--avatar-md);
-    height: var(--avatar-md);
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
   }
 
   .online-dot {
@@ -83,7 +78,7 @@
 <div class="chat-toolbar">
   <div class="user">
     <div class="avatar-wrap">
-      <img src={user.avatar} alt="{user.first} {user.last}" class="avatar" />
+      <Avatar first={user.first} last={user.last} size="md" />
       <span class="online-dot" />
     </div>
     <div class="user-info">

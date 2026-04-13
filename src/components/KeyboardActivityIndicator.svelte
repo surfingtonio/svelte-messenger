@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { onDestroy } from 'svelte';
 
-  export let keyboardActivity = false;
-  export let keyboardActivityStatus = 'User is typing';
+  export let keyboardActivity: boolean = false;
+  export let keyboardActivityStatus: string = 'User is typing';
 
-  let intervalId;
-  let dotCount = 1;
+  let intervalId: ReturnType<typeof setInterval> | undefined;
+  let dotCount: number = 1;
 
   function startAnimation() {
     clearInterval(intervalId);

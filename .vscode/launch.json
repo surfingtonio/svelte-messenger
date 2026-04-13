@@ -5,7 +5,9 @@
       "name": "Server",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/server.js",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "cwd": "${workspaceFolder}",
       "env": {
         "PORT": "4000"
       },
@@ -17,12 +19,13 @@
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": ["run", "dev", "--", "--host"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "serverReadyAction": {
-        "pattern": "Your application is ready",
-        "uriFormat": "http://localhost:5000"
+        "pattern": "Local:\\s+(http://localhost:\\d+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
       }
     }
   ],

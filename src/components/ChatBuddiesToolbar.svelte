@@ -1,14 +1,23 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import Avatar from './Avatar.svelte';
+  import type { User } from '../types';
 
-  export let user = null;
+  export let user: User | null = null;
 
-  let search = '';
+  let search: string = '';
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    filterusers: string;
+    logout: void;
+  }>();
 
   function handleFilterUsers() {
     dispatch('filterusers', search);
+  }
+
+  function handleLogout() {
+    dispatch('logout');
   }
 </script>
 
@@ -22,19 +31,44 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 1rem;
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+
+  .logout-btn:hover {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #dc2626;
   }
 
   .app-icon {
     width: 2rem;
     height: 2rem;
-    background: var(--brand-primary);
-    border-radius: var(--border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 0.9rem;
     flex-shrink: 0;
   }
 
@@ -58,14 +92,6 @@
   .avatar-wrap {
     position: relative;
     flex-shrink: 0;
-  }
-
-  .avatar {
-    width: var(--avatar-md);
-    height: var(--avatar-md);
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
   }
 
   .online-dot {
@@ -137,17 +163,22 @@
 </style>
 
 <div class="sidebar-header">
-  <div class="app-brand">
-    <div class="app-icon">
-      <i class="fas fa-comment-dots" />
+  <div class="brand-row">
+    <div class="app-brand">
+      <div class="app-icon">
+        <img src="/logo.svg" alt="Messenger logo" width="32" height="32" />
+      </div>
+      <span class="app-name">Messenger</span>
     </div>
-    <span class="app-name">Messenger</span>
+    <button class="logout-btn" on:click={handleLogout} title="Log out">
+      <i class="fas fa-sign-out-alt" />
+    </button>
   </div>
 
   {#if user}
     <div class="current-user">
       <div class="avatar-wrap">
-        <img src={user.avatar} alt="{user.first} {user.last}" class="avatar" />
+        <Avatar first={user.first} last={user.last} size="md" />
         <span class="online-dot" />
       </div>
       <div class="user-info">

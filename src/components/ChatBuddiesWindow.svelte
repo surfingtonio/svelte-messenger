@@ -1,21 +1,20 @@
-<script>
+<script lang="ts">
   import ChatBuddiesToolbar from './ChatBuddiesToolbar.svelte';
   import ChatBuddies from './ChatBuddies.svelte';
+  import type { User } from '../types';
 
-  export let users = [];
-  export let user = null;
-  export let selectedBuddyId;
+  export let users: User[] = [];
+  export let user: User | null = null;
+  export let selectedBuddyId: number | undefined = undefined;
 
-  let filterText;
+  let filterText: string = '';
 
-  function filterUsers(users, text) {
-    return users.filter(user => {
-      const regex = RegExp(text, 'i');
-      return regex.test(`${user.first} ${user.last}`);
-    });
+  function filterUsers(list: User[], text: string): User[] {
+    const regex = new RegExp(text, 'i');
+    return list.filter((u) => regex.test(`${u.first} ${u.last}`));
   }
 
-  function handleFilterUsers(event) {
+  function handleFilterUsers(event: CustomEvent<string>) {
     filterText = event.detail;
   }
 
@@ -36,7 +35,8 @@
 <div class="chat-buddies-window">
   <ChatBuddiesToolbar
     {user}
-    on:filterusers={handleFilterUsers} />
+    on:filterusers={handleFilterUsers}
+    on:logout />
   <ChatBuddies
     bind:selectedUserId={selectedBuddyId}
     users={filteredUsers}

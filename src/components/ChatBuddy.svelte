@@ -1,6 +1,9 @@
-<script>
-  export let user;
-  export let selected = false;
+<script lang="ts">
+  import Avatar from './Avatar.svelte';
+  import type { User } from '../types';
+
+  export let user: User;
+  export let selected: boolean = false;
 </script>
 
 <style>
@@ -26,14 +29,6 @@
   .avatar-wrap {
     position: relative;
     flex-shrink: 0;
-  }
-
-  .avatar {
-    width: var(--avatar-md);
-    height: var(--avatar-md);
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
   }
 
   .online-dot {
@@ -75,7 +70,7 @@
 
 <div class="chat-buddy" class:selected on:click>
   <div class="avatar-wrap">
-    <img src={user.avatar} alt="{user.first} {user.last}" class="avatar" />
+    <Avatar first={user.first} last={user.last} size="md" />
     <span class="online-dot" />
   </div>
   <div class="info">

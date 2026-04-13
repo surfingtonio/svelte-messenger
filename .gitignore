@@ -1,4 +1,18 @@
-/node_modules/
-/public/build/
+# Dependencies
+node_modules/
 
+# Build output
+dist/
+public/build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Agent / tool artifacts
+.playwright-mcp/
+
+# OS
 .DS_Store
+
+# Logs
+*.log

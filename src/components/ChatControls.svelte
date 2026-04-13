@@ -1,11 +1,14 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  export let disabled = false;
+  export let disabled: boolean = false;
 
-  let message = '';
+  let message: string = '';
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    messagesend: string;
+    keyboardactivity: KeyboardEvent;
+  }>();
 
   function handleMessageSend() {
     const trimmed = message.trim();
@@ -15,7 +18,7 @@
     }
   }
 
-  function handleKeydown(event) {
+  function handleKeydown(event: KeyboardEvent) {
     dispatch('keyboardactivity', event);
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();

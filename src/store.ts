@@ -1,13 +1,14 @@
 import { writable } from 'svelte/store';
+import type { AppState } from './types';
 
-const app = writable({
+const app = writable<AppState>({
   config: {
     namespace: '/chatrooms',
-    keyboardActivityTimeOut: 1000
+    keyboardActivityTimeOut: 1000,
   },
   user: {},
   users: {},
-  chats: {}
+  chats: {},
 });
 
 export default app;

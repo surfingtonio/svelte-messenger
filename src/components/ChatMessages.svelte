@@ -1,15 +1,16 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
   import ChatMessage from './ChatMessage.svelte';
+  import type { User, ChatMsg } from '../types';
 
-  export let user;
-  export let chats = [];
-  export let disabled = false;
+  export let user: User;
+  export let chats: ChatMsg[] = [];
+  export let disabled: boolean = false;
 
-  let chatWindow;
+  let chatWindow: HTMLDivElement;
 
   onMount(() => {
-    var observer = new MutationObserver(mutations => {
+    const observer = new MutationObserver(() => {
       chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
     });
     observer.observe(chatWindow, { childList: true });

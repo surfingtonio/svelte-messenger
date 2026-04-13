@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import ChatBuddy from './ChatBuddy.svelte';
+  import type { User } from '../types';
 
-  export let users = [];
-  export let selectedUserId;
+  export let users: User[] = [];
+  export let selectedUserId: number | undefined = undefined;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ selectbuddy: number }>();
 
-  function handleClick(user) {
+  function handleClick(user: User) {
     selectedUserId = user.id;
     dispatch('selectbuddy', selectedUserId);
   }

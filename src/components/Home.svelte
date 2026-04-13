@@ -1,6 +1,8 @@
-<script>
-  export let user;
-  export let usersCount = 0;
+<script lang="ts">
+  import type { User } from '../types';
+
+  export let user: Partial<User>;
+  export let usersCount: number = 0;
 </script>
 
 <style>

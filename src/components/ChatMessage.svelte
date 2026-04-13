@@ -1,8 +1,10 @@
-<script>
+<script lang="ts">
   import moment from 'moment';
+  import Avatar from './Avatar.svelte';
+  import type { User, ChatMsg } from '../types';
 
-  export let chat;
-  export let user;
+  export let chat: ChatMsg;
+  export let user: User;
 
   $: isYou = chat.sender.id === user.id;
 </script>
@@ -25,11 +27,7 @@
     align-self: flex-start;
   }
 
-  .avatar {
-    width: var(--avatar-sm);
-    height: var(--avatar-sm);
-    border-radius: 50%;
-    object-fit: cover;
+  .avatar-slot {
     flex-shrink: 0;
     margin-bottom: 0.25rem;
   }
@@ -94,11 +92,9 @@
 
 <div class="chat-message" class:you={isYou} class:other={!isYou}>
   {#if !isYou}
-    <img
-      src={chat.sender.avatar}
-      alt="{chat.sender.first} {chat.sender.last}"
-      class="avatar"
-    />
+    <div class="avatar-slot">
+      <Avatar first={chat.sender.first} last={chat.sender.last} size="sm" />
+    </div>
   {/if}
   <div class="bubble-wrap">
     {#if !isYou}
