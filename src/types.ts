@@ -3,8 +3,13 @@ export interface User {
   first: string;
   last: string;
   username: string;
+  roles: string[];
   online: boolean;
   socketId?: string;
+}
+
+export interface AuthPayload extends User {
+  token: string;
 }
 
 export interface ChatMsg {

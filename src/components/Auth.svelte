@@ -1,8 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import type { User } from '../types';
+  import type { AuthPayload } from '../types';
 
-  const dispatch = createEventDispatcher<{ auth: Partial<User> }>();
+  const dispatch = createEventDispatcher<{ auth: AuthPayload }>();
 
   let mode: 'login' | 'signup' = 'login';
   let loading: boolean = false;

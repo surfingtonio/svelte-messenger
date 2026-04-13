@@ -6,6 +6,7 @@
   export let users: User[] = [];
   export let user: User | null = null;
   export let selectedBuddyId: number | undefined = undefined;
+  export let isAdmin: boolean = false;
 
   let filterText: string = '';
 
@@ -35,8 +36,10 @@
 <div class="chat-buddies-window">
   <ChatBuddiesToolbar
     {user}
+    {isAdmin}
     on:filterusers={handleFilterUsers}
-    on:logout />
+    on:logout
+    on:toggleadmin />
   <ChatBuddies
     bind:selectedUserId={selectedBuddyId}
     users={filteredUsers}

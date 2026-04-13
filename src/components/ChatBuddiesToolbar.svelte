@@ -4,12 +4,14 @@
   import type { User } from '../types';
 
   export let user: User | null = null;
+  export let isAdmin: boolean = false;
 
   let search: string = '';
 
   const dispatch = createEventDispatcher<{
     filterusers: string;
     logout: void;
+    toggleadmin: void;
   }>();
 
   function handleFilterUsers() {
@@ -18,6 +20,10 @@
 
   function handleLogout() {
     dispatch('logout');
+  }
+
+  function handleToggleAdmin() {
+    dispatch('toggleadmin');
   }
 </script>
 
@@ -38,6 +44,35 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1rem;
+  }
+
+  .btn-group {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .admin-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.875rem;
+    height: 1.875rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+
+  .admin-btn:hover {
+    background: var(--brand-primary-light);
+    border-color: rgba(108, 99, 255, 0.4);
+    color: var(--brand-primary);
   }
 
   .logout-btn {
@@ -170,9 +205,16 @@
       </div>
       <span class="app-name">Messenger</span>
     </div>
-    <button class="logout-btn" on:click={handleLogout} title="Log out">
-      <i class="fas fa-sign-out-alt" />
-    </button>
+    <div class="btn-group">
+      {#if isAdmin}
+        <button class="admin-btn" on:click={handleToggleAdmin} title="Admin panel">
+          <i class="fas fa-users-cog" />
+        </button>
+      {/if}
+      <button class="logout-btn" on:click={handleLogout} title="Log out">
+        <i class="fas fa-sign-out-alt" />
+      </button>
+    </div>
   </div>
 
   {#if user}

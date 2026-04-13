@@ -8,7 +8,8 @@
   import ChatBuddiesWindow from './components/ChatBuddiesWindow.svelte';
   import ChatWindow from './components/ChatWindow.svelte';
   import Home from './components/Home.svelte';
-  import type { User, ChatMsg } from './types';
+  import AdminPanel from './components/AdminPanel.svelte';
+  import type { User, ChatMsg, AuthPayload } from './types';
 
   interface KeyboardActivityEntry {
     timeoutId: ReturnType<typeof setTimeout>;
@@ -17,6 +18,8 @@
   let keyboardActivities: Record<string, KeyboardActivityEntry | null> = {};
   let selectedBuddyId: number | null = null;
   let loggedIn = false;
+  let adminView = false;
+  let authToken = '';
   let socket: Socket | null = null;
 
   function appendToStore(store: 'chats', key: string | number, data: ChatMsg) {
@@ -69,8 +72,9 @@
     socket.emit('userregister', user);
   }
 
-  function handleAuth(event: CustomEvent<Partial<User>>) {
-    const user = event.detail;
+  function handleAuth(event: CustomEvent<AuthPayload>) {
+    const { token, ...user } = event.detail;
+    authToken = token;
     $app = _.set($app, 'user', user);
     loggedIn = true;
     connect(user);
@@ -87,6 +91,8 @@
     $app = _.set($app, 'chats', {});
     selectedBuddyId = null;
     keyboardActivities = {};
+    adminView = false;
+    authToken = '';
     loggedIn = false;
   }
 
@@ -97,6 +103,12 @@
 
   function handleSelectBuddy(event: CustomEvent<number>) {
     selectedBuddyId = event.detail;
+    adminView = false;
+  }
+
+  function handleToggleAdmin() {
+    adminView = !adminView;
+    if (adminView) selectedBuddyId = null;
   }
 
   function handleMessageSend(event: CustomEvent<ChatMsg>) {
@@ -125,6 +137,8 @@
   $: buddies = _.filter(users, (buddy: User) => buddy.online && buddy.id !== (user as User).id);
   $: usersCount = buddies.length;
   $: keyboardActivity = _.get(keyboardActivities, String(selectedBuddyId), null);
+  $: isAdmin = (user as User).roles?.includes('admin') ?? false;
+  $: adminSelfId = (user as User).id ?? 0;
   $: chatWindowProps = {
     sender: user as User,
     receiver,
@@ -244,10 +258,14 @@
     <ChatBuddiesWindow
       users={buddies}
       {user}
+      {isAdmin}
       bind:selectedBuddyId
       on:selectbuddy={handleSelectBuddy}
-      on:logout={handleLogout} />
-    {#if selectedBuddyId === null}
+      on:logout={handleLogout}
+      on:toggleadmin={handleToggleAdmin} />
+    {#if adminView}
+      <AdminPanel selfId={adminSelfId} token={authToken} />
+    {:else if selectedBuddyId === null}
       <Home bind:usersCount {user} />
     {:else}
       <ChatWindow
