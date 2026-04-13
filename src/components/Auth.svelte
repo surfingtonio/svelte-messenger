@@ -99,311 +99,170 @@
 </script>
 
 <style>
-  .auth-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: var(--bg-app);
-    padding: 1.5rem;
-  }
-
-  .card {
-    background: var(--bg-card);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-    padding: 2.5rem 2rem;
-    width: 100%;
-    max-width: 22rem;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    justify-content: center;
-    margin-bottom: 2rem;
-  }
-
-  .brand-icon {
-    width: 2.25rem;
-    height: 2.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .brand-name {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.02em;
-  }
-
-  .tabs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    background: var(--bg-input);
-    border-radius: var(--border-radius);
-    padding: 0.25rem;
-    margin-bottom: 1.75rem;
-  }
-
-  .tab {
-    padding: 0.5rem;
-    text-align: center;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    border-radius: calc(var(--border-radius) - 0.125rem);
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    transition: background var(--transition), color var(--transition);
-    font-family: inherit;
-  }
-
-  .tab.active {
-    background: var(--bg-card);
-    color: var(--brand-primary);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.875rem;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.625rem;
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-  }
-
-  label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  input {
-    background: var(--bg-input);
-    border: 1.5px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    padding: 0.625rem 0.75rem;
-    font-size: 0.9rem;
-    font-family: inherit;
-    color: var(--text-primary);
-    outline: none;
-    transition: border-color var(--transition), box-shadow var(--transition);
-    width: 100%;
-  }
-
-  input::placeholder {
-    color: var(--text-muted);
-  }
-
-  input:focus {
-    border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px var(--brand-primary-light);
-    background: #fff;
-  }
-
-  .error {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(239, 68, 68, 0.08);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: #dc2626;
-    font-size: 0.8125rem;
-    padding: 0.625rem 0.75rem;
-    border-radius: var(--border-radius-sm);
-    margin-top: 0.25rem;
-  }
-
-  .submit-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--brand-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-    margin-top: 0.25rem;
-    box-shadow: 0 2px 8px rgba(108, 99, 255, 0.35);
-  }
-
-  .submit-btn:hover:not(:disabled) {
-    background: var(--brand-primary-dark);
-    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.45);
-  }
-
-  .submit-btn:active:not(:disabled) {
-    transform: scale(0.98);
-  }
-
-  .submit-btn:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
-  .spinner-inline {
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    vertical-align: middle;
-    margin-right: 0.375rem;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  /* Tailwind utilities handle layout/colours; only custom pseudo-selector tweaks live here */
+  input:focus { outline: none; }
 </style>
 
-<div class="auth-screen">
-  <div class="card">
-    <div class="brand">
-      <div class="brand-icon">
-        <img src="/logo.svg" alt="Messenger logo" width="36" height="36" />
+<div class="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950 px-4 py-8">
+  <div class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden">
+
+    <!-- Brand header -->
+    <div class="flex items-center justify-center gap-3 pt-8 pb-2 px-8">
+      <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center shadow-sm">
+        <i class="fas fa-comment-dots text-white text-base" />
       </div>
-      <span class="brand-name">Messenger</span>
+      <span class="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Messenger</span>
     </div>
 
-    <div class="tabs">
-      <button class="tab" class:active={mode === 'login'} on:click={() => switchMode('login')}>
-        Log In
-      </button>
-      <button class="tab" class:active={mode === 'signup'} on:click={() => switchMode('signup')}>
-        Sign Up
-      </button>
+    <!-- Tabs -->
+    <div class="flex mx-6 mt-6 mb-0 gap-1 bg-slate-100 dark:bg-slate-700/60 rounded-xl p-1">
+      <button
+        class="flex-1 py-2 text-sm font-semibold rounded-lg transition
+          {mode === 'login'
+            ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 shadow-sm'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}"
+        on:click={() => switchMode('login')}
+      >Log In</button>
+      <button
+        class="flex-1 py-2 text-sm font-semibold rounded-lg transition
+          {mode === 'signup'
+            ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 shadow-sm'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}"
+        on:click={() => switchMode('signup')}
+      >Sign Up</button>
     </div>
 
-    {#if mode === 'login'}
-      <div class="form">
-        <div class="field">
-          <label for="login-username">Username</label>
-          <input
-            id="login-username"
-            type="text"
-            placeholder="Enter your username"
-            bind:value={loginUsername}
-            on:keydown={onLoginKeydown}
-            disabled={loading}
-            autocomplete="username"
-          />
-        </div>
-        <div class="field">
-          <label for="login-password">Password</label>
-          <input
-            id="login-password"
-            type="password"
-            placeholder="Enter your password"
-            bind:value={loginPassword}
-            on:keydown={onLoginKeydown}
-            disabled={loading}
-            autocomplete="current-password"
-          />
-        </div>
-        {#if error}
-          <div class="error">
-            <i class="fas fa-exclamation-circle" />
-            {error}
-          </div>
-        {/if}
-        <button class="submit-btn" on:click={handleLogin} disabled={loading}>
-          {#if loading}<span class="spinner-inline" />{/if}
-          {loading ? 'Logging in…' : 'Log In'}
-        </button>
-      </div>
-    {:else}
-      <div class="form">
-        <div class="row">
-          <div class="field">
-            <label for="signup-first">First name</label>
+    <!-- Forms -->
+    <div class="px-8 py-6 space-y-4">
+      {#if mode === 'login'}
+        <div class="space-y-4">
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide" for="login-username">Username</label>
             <input
-              id="signup-first"
+              id="login-username"
               type="text"
-              placeholder="Jane"
-              bind:value={signupFirst}
+              placeholder="Enter your username"
+              bind:value={loginUsername}
+              on:keydown={onLoginKeydown}
               disabled={loading}
-              autocomplete="given-name"
+              autocomplete="username"
+              class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
-          <div class="field">
-            <label for="signup-last">Last name</label>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide" for="login-password">Password</label>
             <input
-              id="signup-last"
-              type="text"
-              placeholder="Doe"
-              bind:value={signupLast}
+              id="login-password"
+              type="password"
+              placeholder="Enter your password"
+              bind:value={loginPassword}
+              on:keydown={onLoginKeydown}
               disabled={loading}
-              autocomplete="family-name"
+              autocomplete="current-password"
+              class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
-        </div>
-        <div class="field">
-          <label for="signup-username">Username</label>
-          <input
-            id="signup-username"
-            type="text"
-            placeholder="Choose a username"
-            bind:value={signupUsername}
+          {#if error}
+            <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs px-3 py-2.5 rounded-lg">
+              <i class="fas fa-exclamation-circle shrink-0" />
+              {error}
+            </div>
+          {/if}
+          <button
+            class="w-full py-3 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-semibold rounded-xl transition shadow-[0_2px_8px_theme(colors.brand.500/35%)] hover:shadow-[0_4px_12px_theme(colors.brand.500/45%)] disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+            on:click={handleLogin}
             disabled={loading}
-            autocomplete="username"
-          />
+          >
+            {#if loading}<i class="fas fa-spinner fa-spin mr-2" />{/if}
+            {loading ? 'Signing in…' : 'Log In'}
+          </button>
         </div>
-        <div class="field">
-          <label for="signup-password">Password</label>
-          <input
-            id="signup-password"
-            type="password"
-            placeholder="At least 6 characters"
-            bind:value={signupPassword}
-            disabled={loading}
-            autocomplete="new-password"
-          />
-        </div>
-        <div class="field">
-          <label for="signup-confirm">Confirm password</label>
-          <input
-            id="signup-confirm"
-            type="password"
-            placeholder="Repeat your password"
-            bind:value={signupConfirm}
-            on:keydown={onSignupKeydown}
-            disabled={loading}
-            autocomplete="new-password"
-          />
-        </div>
-        {#if error}
-          <div class="error">
-            <i class="fas fa-exclamation-circle" />
-            {error}
+
+      {:else}
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide" for="signup-first">First name</label>
+              <input
+                id="signup-first"
+                type="text"
+                placeholder="Jane"
+                bind:value={signupFirst}
+                on:keydown={onSignupKeydown}
+                disabled={loading}
+                autocomplete="given-name"
+                class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide" for="signup-last">Last name</label>
+              <input
+                id="signup-last"
+                type="text"
+                placeholder="Doe"
+                bind:value={signupLast}
+                on:keydown={onSignupKeydown}
+                disabled={loading}
+                autocomplete="family-name"
+                class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              />
+            </div>
           </div>
-        {/if}
-        <button class="submit-btn" on:click={handleSignup} disabled={loading}>
-          {#if loading}<span class="spinner-inline" />{/if}
-          {loading ? 'Creating account…' : 'Create Account'}
-        </button>
-      </div>
-    {/if}
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide" for="signup-username">Username</label>
+            <input
+              id="signup-username"
+              type="text"
+              placeholder="Choose a username"
+              bind:value={signupUsername}
+              on:keydown={onSignupKeydown}
+              disabled={loading}
+              autocomplete="username"
+              class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide" for="signup-password">Password</label>
+            <input
+              id="signup-password"
+              type="password"
+              placeholder="At least 6 characters"
+              bind:value={signupPassword}
+              on:keydown={onSignupKeydown}
+              disabled={loading}
+              autocomplete="new-password"
+              class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide" for="signup-confirm">Confirm password</label>
+            <input
+              id="signup-confirm"
+              type="password"
+              placeholder="Repeat your password"
+              bind:value={signupConfirm}
+              on:keydown={onSignupKeydown}
+              disabled={loading}
+              autocomplete="new-password"
+              class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            />
+          </div>
+          {#if error}
+            <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs px-3 py-2.5 rounded-lg">
+              <i class="fas fa-exclamation-circle shrink-0" />
+              {error}
+            </div>
+          {/if}
+          <button
+            class="w-full py-3 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-semibold rounded-xl transition shadow-[0_2px_8px_theme(colors.brand.500/35%)] hover:shadow-[0_4px_12px_theme(colors.brand.500/45%)] disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+            on:click={handleSignup}
+            disabled={loading}
+          >
+            {#if loading}<i class="fas fa-spinner fa-spin mr-2" />{/if}
+            {loading ? 'Creating account…' : 'Create Account'}
+          </button>
+        </div>
+      {/if}
+    </div>
   </div>
 </div>

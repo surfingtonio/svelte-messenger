@@ -1,97 +1,39 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import Avatar from './Avatar.svelte';
   import type { User } from '../types';
 
   export let user: User;
   export let usersCount: number = 0;
+
+  const dispatch = createEventDispatcher<{ back: void }>();
 </script>
 
-<style>
-  .chat-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.875rem 1.25rem;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
-    height: var(--toolbar-height);
-  }
-
-  .user {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .avatar-wrap {
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .online-dot {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 0.625rem;
-    height: 0.625rem;
-    background: var(--color-online);
-    border-radius: 50%;
-    border: 2px solid white;
-  }
-
-  .user-info .name {
-    font-weight: 700;
-    font-size: 0.9375rem;
-    color: var(--text-primary);
-    line-height: 1.2;
-  }
-
-  .user-info .status {
-    font-size: 0.75rem;
-    color: var(--color-online);
-    font-weight: 500;
-  }
-
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .online-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    background: var(--brand-primary-light);
-    color: var(--brand-primary);
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--border-radius-full);
-  }
-
-  .online-badge i {
-    font-size: 0.7rem;
-  }
-</style>
-
-<div class="chat-toolbar">
-  <div class="user">
-    <div class="avatar-wrap">
+<div class="flex items-center justify-between px-4 h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0">
+  <div class="flex items-center gap-3">
+    <!-- Mobile back button -->
+    <button
+      class="md:hidden w-8 h-8 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-sm font-[inherit] -ml-1"
+      on:click={() => dispatch('back')}
+      aria-label="Back to contacts"
+    >
+      <i class="fas fa-arrow-left" />
+    </button>
+    <div class="relative shrink-0">
       <Avatar first={user.first} last={user.last} size="md" />
-      <span class="online-dot" />
+      <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-800" />
     </div>
-    <div class="user-info">
-      <div class="name">{user.first} {user.last}</div>
-      <div class="status">Online</div>
+    <div>
+      <div class="font-bold text-[0.9375rem] text-slate-900 dark:text-slate-100 leading-tight">{user.first} {user.last}</div>
+      <div class="text-xs text-green-500 font-medium">Online</div>
     </div>
   </div>
-  <div class="controls">
+  <div>
     <div
-      class="online-badge"
+      class="flex items-center gap-1.5 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-semibold px-3 py-1.5 rounded-full"
       title="{usersCount} online {usersCount === 1 ? 'user' : 'users'}"
     >
-      <i class="fas fa-users" />
+      <i class="fas fa-users text-[0.7rem]" />
       {usersCount} online
     </div>
   </div>

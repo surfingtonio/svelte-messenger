@@ -12,100 +12,22 @@
   }
 </script>
 
-<style>
-  .chat-message {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    max-width: 70%;
-    margin-bottom: 0.125rem;
-  }
-
-  .chat-message.you {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-  }
-
-  .chat-message.other {
-    align-self: flex-start;
-  }
-
-  .avatar-slot {
-    flex-shrink: 0;
-    margin-bottom: 0.25rem;
-  }
-
-  .bubble-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
-
-  .you .bubble-wrap {
-    align-items: flex-end;
-  }
-
-  .other .bubble-wrap {
-    align-items: flex-start;
-  }
-
-  .sender-name {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    padding: 0 0.5rem;
-  }
-
-  .bubble {
-    padding: 0.625rem 0.9rem;
-    border-radius: 1.125rem;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    word-break: break-word;
-    max-width: 100%;
-    position: relative;
-  }
-
-  .you .bubble {
-    background: var(--bg-message-out);
-    color: var(--text-inverse);
-    border-bottom-right-radius: 0.25rem;
-  }
-
-  .other .bubble {
-    background: var(--bg-message-in);
-    color: var(--text-primary);
-    border-bottom-left-radius: 0.25rem;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .time {
-    font-size: 0.65rem;
-    opacity: 0.7;
-    display: block;
-    margin-top: 0.25rem;
-    padding: 0 0.5rem;
-    color: var(--text-muted);
-  }
-
-  .you .time {
-    text-align: right;
-  }
-</style>
-
-<div class="chat-message" class:you={isYou} class:other={!isYou}>
+<div class="flex items-end gap-2 max-w-[70%] mb-0.5 {isYou ? 'self-end flex-row-reverse' : 'self-start'}">
   {#if !isYou}
-    <div class="avatar-slot">
+    <div class="shrink-0 mb-1">
       <Avatar first={chat.sender.first} last={chat.sender.last} size="sm" />
     </div>
   {/if}
-  <div class="bubble-wrap">
+  <div class="flex flex-col gap-0.5 {isYou ? 'items-end' : 'items-start'}">
     {#if !isYou}
-      <span class="sender-name">{chat.sender.first}</span>
+      <span class="text-[0.7rem] font-semibold text-slate-400 dark:text-slate-500 px-2">{chat.sender.first}</span>
     {/if}
-    <div class="bubble">
-      {chat.message.content}
-    </div>
-    <span class="time">{formatTime(chat.message.time)}</span>
+    <div
+      class="px-3.5 py-2.5 rounded-[1.125rem] text-sm leading-relaxed break-words max-w-full
+        {isYou
+          ? 'bg-brand-500 text-white rounded-br-[0.25rem]'
+          : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-[0.25rem] shadow-sm'}"
+    >{chat.message.content}</div>
+    <span class="text-[0.65rem] opacity-60 px-2 text-slate-500 dark:text-slate-400 {isYou ? 'text-right' : ''}">{formatTime(chat.message.time)}</span>
   </div>
 </div>

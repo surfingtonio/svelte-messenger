@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Avatar from './Avatar.svelte';
+  import { formatDate } from '../utils';
 
   export let selfId: number;
   export let token: string;
@@ -14,7 +15,7 @@
     createdAt: number;
   }
 
-  const dispatch = createEventDispatcher<{ sessionexpired: void }>();
+  const dispatch = createEventDispatcher<{ sessionexpired: void; back: void }>();
 
   let users: AdminUser[] = [];
   let loading = true;
@@ -27,14 +28,6 @@
       return false;
     }
     return res.ok;
-  }
-
-  function formatDate(ts: number): string {
-    return new Date(ts * 1000).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
   }
 
   async function loadUsers() {
@@ -102,392 +95,183 @@
   loadUsers();
 </script>
 
-<style>
-  .admin-panel {
-    display: grid;
-    grid-template-rows: var(--toolbar-height) 1fr;
-    height: 100vh;
-    background: var(--bg-chat);
-    overflow: hidden;
-  }
+<div class="flex flex-col h-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
 
-  .admin-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1.5rem;
-    background: var(--bg-card);
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
-    flex-shrink: 0;
-  }
-
-  .admin-toolbar-left {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .toolbar-icon {
-    width: 2rem;
-    height: 2rem;
-    background: var(--brand-primary-light);
-    color: var(--brand-primary);
-    border-radius: var(--border-radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-  }
-
-  .toolbar-title {
-    font-weight: 600;
-    font-size: 0.9375rem;
-    color: var(--text-primary);
-  }
-
-  .toolbar-count {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    background: var(--bg-input);
-    padding: 0.125rem 0.5rem;
-    border-radius: var(--border-radius-full);
-    border: 1px solid var(--border-color);
-  }
-
-  .reload-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition), border-color var(--transition);
-    font-family: inherit;
-  }
-
-  .reload-btn:hover {
-    background: var(--brand-primary-light);
-    border-color: var(--brand-primary);
-    color: var(--brand-primary);
-  }
-
-  .admin-content {
-    overflow-y: auto;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .action-error-banner {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background: rgba(239, 68, 68, 0.08);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: var(--border-radius);
-    color: #dc2626;
-    font-size: 0.875rem;
-  }
-
-  .dismiss-btn {
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #dc2626;
-    font-size: 0.8rem;
-    padding: 0.125rem 0.25rem;
-    font-family: inherit;
-  }
-
-  .status-msg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 10rem;
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    gap: 0.5rem;
-  }
-
-  .error-msg {
-    color: #dc2626;
-  }
-
-  .users-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--bg-card);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-color);
-  }
-
-  .users-table thead tr {
-    background: var(--bg-input);
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .users-table th {
-    padding: 0.75rem 1rem;
-    text-align: left;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .users-table td {
-    padding: 0.875rem 1rem;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-  }
-
-  .users-table tbody tr:last-child td {
-    border-bottom: none;
-  }
-
-  .users-table tbody tr:hover {
-    background: var(--bg-input);
-  }
-
-  .users-table tbody tr.self-row {
-    background: var(--brand-primary-light);
-  }
-
-  .users-table tbody tr.self-row:hover {
-    background: var(--brand-primary-light);
-  }
-
-  .user-cell {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .user-info-text {
-    min-width: 0;
-  }
-
-  .user-name {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .user-username {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-  }
-
-  .roles-cell {
-    display: flex;
-    gap: 0.375rem;
-    flex-wrap: wrap;
-  }
-
-  .role-badge {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--border-radius-full);
-    text-transform: capitalize;
-    letter-spacing: 0.02em;
-  }
-
-  .role-user {
-    background: rgba(34, 197, 94, 0.12);
-    color: #16a34a;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-  }
-
-  .role-admin {
-    background: var(--brand-primary-light);
-    color: var(--brand-primary);
-    border: 1px solid rgba(108, 99, 255, 0.3);
-  }
-
-  .date-cell {
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-  }
-
-  .actions-cell {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: var(--border-radius-sm);
-    border: 1px solid transparent;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background var(--transition), color var(--transition), border-color var(--transition);
-    white-space: nowrap;
-  }
-
-  .grant-btn {
-    background: var(--brand-primary-light);
-    color: var(--brand-primary);
-    border-color: rgba(108, 99, 255, 0.3);
-  }
-
-  .grant-btn:hover {
-    background: var(--brand-primary);
-    color: white;
-    border-color: var(--brand-primary);
-  }
-
-  .revoke-btn {
-    background: rgba(239, 68, 68, 0.08);
-    color: #dc2626;
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-
-  .revoke-btn:hover {
-    background: #dc2626;
-    color: white;
-    border-color: #dc2626;
-  }
-
-  .delete-btn {
-    background: transparent;
-    color: var(--text-muted);
-    border-color: var(--border-color);
-  }
-
-  .delete-btn:hover {
-    background: rgba(239, 68, 68, 0.08);
-    color: #dc2626;
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-
-  .self-badge {
-    font-size: 0.6875rem;
-    font-weight: 600;
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--border-radius-full);
-    background: var(--bg-input);
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
-  }
-</style>
-
-<div class="admin-panel">
-  <div class="admin-toolbar">
-    <div class="admin-toolbar-left">
-      <div class="toolbar-icon">
+  <!-- Toolbar -->
+  <div class="flex items-center justify-between px-4 h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shrink-0">
+    <div class="flex items-center gap-3">
+      <!-- Mobile back button -->
+      <button
+        class="md:hidden w-8 h-8 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-sm font-[inherit] -ml-1"
+        on:click={() => dispatch('back')}
+        aria-label="Back to contacts"
+      >
+        <i class="fas fa-arrow-left" />
+      </button>
+      <div class="w-8 h-8 bg-brand-100 dark:bg-brand-900/30 text-brand-500 dark:text-brand-400 rounded-md flex items-center justify-center text-sm">
         <i class="fas fa-users-cog" />
       </div>
-      <span class="toolbar-title">User Management</span>
+      <span class="font-semibold text-[0.9375rem] text-slate-900 dark:text-slate-100">User Management</span>
       {#if !loading}
-        <span class="toolbar-count">{users.length} {users.length === 1 ? 'user' : 'users'}</span>
+        <span class="text-xs text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-2 py-0.5 rounded-full">
+          {users.length} {users.length === 1 ? 'user' : 'users'}
+        </span>
       {/if}
     </div>
-    <button class="reload-btn" on:click={loadUsers} title="Refresh">
+    <button
+      class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:border-brand-300 dark:hover:border-brand-600 hover:text-brand-500 transition text-xs font-[inherit]"
+      on:click={loadUsers}
+      title="Refresh"
+    >
       <i class="fas fa-sync" />
     </button>
   </div>
 
-  <div class="admin-content">
+  <!-- Content -->
+  <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
     {#if actionError}
-      <div class="action-error-banner">
-        <i class="fas fa-exclamation-triangle" />
-        {actionError}
-        <button class="dismiss-btn" on:click={() => (actionError = '')} aria-label="Dismiss">
+      <div class="flex items-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-xl text-red-600 dark:text-red-400 text-sm">
+        <i class="fas fa-exclamation-triangle shrink-0" />
+        <span class="flex-1">{actionError}</span>
+        <button
+          class="ml-auto text-red-500 hover:text-red-700 text-xs font-[inherit] bg-transparent border-none cursor-pointer"
+          on:click={() => (actionError = '')}
+          aria-label="Dismiss"
+        >
           <i class="fas fa-times" />
         </button>
       </div>
     {/if}
+
     {#if loading}
-      <div class="status-msg">
+      <div class="flex items-center justify-center h-40 text-slate-400 dark:text-slate-500 text-sm gap-2">
         <i class="fas fa-spinner fa-spin" />
         Loading users...
       </div>
     {:else if error}
-      <div class="status-msg error-msg">
+      <div class="flex items-center justify-center h-40 text-red-500 text-sm gap-2">
         <i class="fas fa-exclamation-circle" />
         {error}
       </div>
     {:else}
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Roles</th>
-            <th>Joined</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each users as user (user.id)}
-            <tr class:self-row={user.id === selfId}>
-              <td>
-                <div class="user-cell">
-                  <Avatar first={user.first} last={user.last} size="sm" />
-                  <div class="user-info-text">
-                    <div class="user-name">{user.first} {user.last}</div>
-                    <div class="user-username">@{user.username}</div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <!-- Desktop table -->
+        <table class="w-full border-collapse hidden sm:table">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-700/60 border-b border-slate-200 dark:border-slate-700">
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">User</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Roles</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Joined</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each users as user (user.id)}
+              <tr
+                class="border-b border-slate-100 dark:border-slate-700 last:border-0 transition
+                  {user.id === selfId ? 'bg-brand-50/50 dark:bg-brand-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-700/30'}"
+              >
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-3">
+                    <Avatar first={user.first} last={user.last} size="sm" />
+                    <div class="min-w-0">
+                      <div class="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate">{user.first} {user.last}</div>
+                      <div class="text-xs text-slate-400 dark:text-slate-500">@{user.username}</div>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <div class="roles-cell">
-                  {#each user.roles as role}
-                    <span class="role-badge" class:role-user={role === 'user'} class:role-admin={role === 'admin'}>
-                      {role}
-                    </span>
-                  {/each}
-                </div>
-              </td>
-              <td class="date-cell">{formatDate(user.createdAt)}</td>
-              <td>
-                <div class="actions-cell">
-                  {#if user.id !== selfId}
-                    {#if user.roles.includes('admin')}
-                      <button class="action-btn revoke-btn" on:click={() => toggleAdmin(user)} title="Revoke admin role">
-                        <i class="fas fa-shield-alt" />
-                        Revoke Admin
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="flex gap-1.5 flex-wrap">
+                    {#each user.roles as role}
+                      <span class="text-[0.6875rem] font-semibold px-2 py-0.5 rounded-full capitalize tracking-wide
+                        {role === 'admin'
+                          ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-700/50'
+                          : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700/50'}"
+                      >{role}</span>
+                    {/each}
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">{formatDate(user.createdAt)}</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    {#if user.id !== selfId}
+                      {#if user.roles.includes('admin')}
+                        <button
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50 hover:bg-red-500 hover:text-white hover:border-red-500 transition whitespace-nowrap font-[inherit] cursor-pointer"
+                          on:click={() => toggleAdmin(user)}
+                        >
+                          <i class="fas fa-shield-alt" />
+                          Revoke Admin
+                        </button>
+                      {:else}
+                        <button
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border-brand-200 dark:border-brand-700/50 hover:bg-brand-500 hover:text-white hover:border-brand-500 transition whitespace-nowrap font-[inherit] cursor-pointer"
+                          on:click={() => toggleAdmin(user)}
+                        >
+                          <i class="fas fa-shield-alt" />
+                          Grant Admin
+                        </button>
+                      {/if}
+                      <button
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 hover:text-red-600 dark:hover:text-red-400 transition font-[inherit] cursor-pointer text-xs"
+                        on:click={() => deleteUser(user)}
+                        title="Delete user"
+                      >
+                        <i class="fas fa-trash" />
                       </button>
                     {:else}
-                      <button class="action-btn grant-btn" on:click={() => toggleAdmin(user)} title="Grant admin role">
-                        <i class="fas fa-shield-alt" />
-                        Grant Admin
-                      </button>
+                      <span class="text-[0.6875rem] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-600">You</span>
                     {/if}
-                    <button class="action-btn delete-btn" on:click={() => deleteUser(user)} title="Delete user">
-                      <i class="fas fa-trash" />
-                    </button>
-                  {:else}
-                    <span class="self-badge">You</span>
-                  {/if}
+                  </div>
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
+        <!-- Mobile card list -->
+        <div class="sm:hidden divide-y divide-slate-100 dark:divide-slate-700">
+          {#each users as user (user.id)}
+            <div class="px-4 py-4 {user.id === selfId ? 'bg-brand-50/50 dark:bg-brand-900/10' : ''}">
+              <div class="flex items-center gap-3 mb-3">
+                <Avatar first={user.first} last={user.last} size="sm" />
+                <div class="min-w-0 flex-1">
+                  <div class="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate">{user.first} {user.last}</div>
+                  <div class="text-xs text-slate-400 dark:text-slate-500">@{user.username} · {formatDate(user.createdAt)}</div>
                 </div>
-              </td>
-            </tr>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                {#each user.roles as role}
+                  <span class="text-[0.6875rem] font-semibold px-2 py-0.5 rounded-full capitalize
+                    {role === 'admin'
+                      ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400'
+                      : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'}"
+                  >{role}</span>
+                {/each}
+                {#if user.id !== selfId}
+                  {#if user.roles.includes('admin')}
+                    <button
+                      class="ml-auto text-xs font-medium px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 font-[inherit] cursor-pointer"
+                      on:click={() => toggleAdmin(user)}
+                    >Revoke</button>
+                  {:else}
+                    <button
+                      class="ml-auto text-xs font-medium px-2.5 py-1 rounded-md bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-700/50 font-[inherit] cursor-pointer"
+                      on:click={() => toggleAdmin(user)}
+                    >Grant Admin</button>
+                  {/if}
+                  <button
+                    class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-red-500 transition font-[inherit] cursor-pointer text-xs"
+                    on:click={() => deleteUser(user)}
+                  ><i class="fas fa-trash" /></button>
+                {:else}
+                  <span class="ml-auto text-[0.6875rem] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 border border-slate-200 dark:border-slate-600">You</span>
+                {/if}
+              </div>
+            </div>
           {/each}
-        </tbody>
-      </table>
+        </div>
+      </div>
     {/if}
   </div>
 </div>

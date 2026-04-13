@@ -40,32 +40,15 @@
   $: keyboardActivityStatus = `${receiver.first} is typing`;
 </script>
 
-<style>
-  .chat-window {
-    display: grid;
-    grid-template-rows: var(--toolbar-height) 1fr auto;
-    height: 100vh;
-    background: var(--bg-chat);
-    overflow: hidden;
-  }
-
-  .messages-area {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-  }
-</style>
-
-<div class="chat-window">
-  <ChatToolbar {...chatToolbarProps} />
-  <div class="messages-area">
+<div class="flex flex-col h-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
+  <ChatToolbar {...chatToolbarProps} on:back />
+  <div class="relative flex flex-col overflow-hidden flex-1 min-h-0">
     <ChatMessages {...chatMessagesProps} />
     <KeyboardActivityIndicator bind:keyboardActivity {keyboardActivityStatus} />
   </div>
   <ChatControls
     {disabled}
     on:keyboardactivity={handleKeyboardActivity}
-    on:messagesend={handleMessageSend} />
+    on:messagesend={handleMessageSend}
+  />
 </div>

@@ -9,6 +9,7 @@
   import ChatWindow from './components/ChatWindow.svelte';
   import Home from './components/Home.svelte';
   import AdminPanel from './components/AdminPanel.svelte';
+  import SettingsModal from './components/SettingsModal.svelte';
   import type { User, ChatMsg, AuthPayload } from './types';
 
   interface KeyboardActivityEntry {
@@ -21,6 +22,9 @@
   let adminView = false;
   let authToken = '';
   let socket: Socket | null = null;
+  let showSettings = false;
+  // Mobile: 'contacts' shows the sidebar, 'chat' shows the main panel
+  let mobileView: 'contacts' | 'chat' = 'contacts';
 
   function appendToStore(store: 'chats', key: string | number, data: ChatMsg) {
     const existingData: ChatMsg[] = _.get($app, `${store}.${key}`, []);
@@ -104,11 +108,19 @@
   function handleSelectBuddy(event: CustomEvent<number>) {
     selectedBuddyId = event.detail;
     adminView = false;
+    mobileView = 'chat';
   }
 
   function handleToggleAdmin() {
     adminView = !adminView;
-    if (adminView) selectedBuddyId = null;
+    if (adminView) {
+      selectedBuddyId = null;
+      mobileView = 'chat';
+    }
+  }
+
+  function handleBack() {
+    mobileView = 'contacts';
   }
 
   function handleMessageSend(event: CustomEvent<ChatMsg>) {
@@ -148,132 +160,51 @@
   };
 </script>
 
-<style>
-  :global(:root) {
-    /* Brand */
-    --brand-primary: #6c63ff;
-    --brand-primary-dark: #5a52e0;
-    --brand-primary-light: rgba(108, 99, 255, 0.1);
-
-    /* Backgrounds */
-    --bg-app: #f0f2f7;
-    --bg-sidebar: #ffffff;
-    --bg-chat: #f0f2f7;
-    --bg-card: #ffffff;
-    --bg-input: #f0f2f7;
-    --bg-message-out: #6c63ff;
-    --bg-message-in: #ffffff;
-    --bg-disabled: #f5f5f5;
-
-    /* Text */
-    --text-primary: #1a1a2e;
-    --text-secondary: #8896ab;
-    --text-muted: #aab4be;
-    --text-inverse: #ffffff;
-    --text-brand: #6c63ff;
-
-    /* Borders */
-    --border-color: #e8ecf0;
-    --border-radius-sm: 0.375rem;
-    --border-radius: 0.75rem;
-    --border-radius-lg: 1.25rem;
-    --border-radius-full: 9999px;
-
-    /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-
-    /* Status */
-    --color-online: #22c55e;
-    --color-offline: #cbd5e1;
-
-    /* Sizing */
-    --sidebar-width: 20rem;
-    --toolbar-height: 4rem;
-    --controls-height: 4rem;
-    --avatar-sm: 2rem;
-    --avatar-md: 2.5rem;
-    --avatar-lg: 3rem;
-
-    /* Transitions */
-    --transition: 0.15s ease;
-    --transition-slow: 0.25s ease;
-  }
-
-  :global(*, *::before, *::after) {
-    box-sizing: border-box;
-  }
-
-  :global(::-webkit-scrollbar) {
-    width: 4px;
-  }
-
-  :global(::-webkit-scrollbar-track) {
-    background: transparent;
-  }
-
-  :global(::-webkit-scrollbar-thumb) {
-    background: var(--border-color);
-    border-radius: var(--border-radius-full);
-  }
-
-  :global(::-webkit-scrollbar-thumb:hover) {
-    background: var(--text-muted);
-  }
-
-  .not-supported {
-    display: none;
-  }
-
-  .container {
-    display: grid;
-    grid-template-columns: var(--sidebar-width) 1fr;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    background: var(--bg-app);
-  }
-
-  @media (max-width: 319px), (max-height: 319px) {
-    .container {
-      display: none;
-    }
-
-    .not-supported {
-      align-items: center;
-      display: flex;
-      height: 100vh;
-      justify-content: center;
-      white-space: nowrap;
-      width: 100vw;
-    }
-  }
-</style>
-
 {#if !loggedIn}
   <Auth on:auth={handleAuth} />
 {:else}
-  <div class="container">
-    <ChatBuddiesWindow
-      users={buddies}
-      {user}
-      {isAdmin}
-      bind:selectedBuddyId
-      on:selectbuddy={handleSelectBuddy}
-      on:logout={handleLogout}
-      on:toggleadmin={handleToggleAdmin} />
-    {#if adminView}
-      <AdminPanel selfId={adminSelfId} token={authToken} on:sessionexpired={handleLogout} />
-    {:else if selectedBuddyId === null}
-      <Home bind:usersCount {user} />
-    {:else}
-      <ChatWindow
-        {...chatWindowProps}
-        on:messagesend={handleMessageSend}
-        on:keyboardactivity={handleKeyboardActivity}
-        on:keyboardactivitystop={handlekeyboardActivityStop} />
-    {/if}
+  <!-- Outer wrapper fills the full viewport height -->
+  <div class="flex h-dvh overflow-hidden bg-slate-100 dark:bg-slate-900">
+
+    <!-- Sidebar (contacts list) — full-width on mobile, fixed 20 rem on md+ -->
+    <aside
+      data-testid="contacts-sidebar"
+      class="flex flex-col w-full md:w-80 shrink-0 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 {mobileView === 'chat' ? 'max-md:hidden' : ''}"
+    >
+      <ChatBuddiesWindow
+        users={buddies}
+        {user}
+        {isAdmin}
+        bind:selectedBuddyId
+        on:selectbuddy={handleSelectBuddy}
+        on:logout={handleLogout}
+        on:toggleadmin={handleToggleAdmin}
+        on:opensettings={() => (showSettings = true)}
+      />
+    </aside>
+
+    <!-- Main content — full-width on mobile, flex-1 on md+ -->
+    <main
+      data-testid="main-panel"
+      class="flex flex-col flex-1 min-w-0 {mobileView !== 'chat' ? 'max-md:hidden' : ''}"
+    >
+      {#if adminView}
+        <AdminPanel selfId={adminSelfId} token={authToken} on:sessionexpired={handleLogout} on:back={handleBack} />
+      {:else if selectedBuddyId === null}
+        <Home bind:usersCount {user} on:back={handleBack} />
+      {:else}
+        <ChatWindow
+          {...chatWindowProps}
+          on:messagesend={handleMessageSend}
+          on:keyboardactivity={handleKeyboardActivity}
+          on:keyboardactivitystop={handlekeyboardActivityStop}
+          on:back={handleBack}
+        />
+      {/if}
+    </main>
   </div>
+
+  {#if showSettings}
+    <SettingsModal on:close={() => (showSettings = false)} />
+  {/if}
 {/if}
-<p class="not-supported">Screen size not supported</p>

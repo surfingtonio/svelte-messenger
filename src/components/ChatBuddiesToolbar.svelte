@@ -12,6 +12,7 @@
     filterusers: string;
     logout: void;
     toggleadmin: void;
+    opensettings: void;
   }>();
 
   function handleFilterUsers() {
@@ -25,216 +26,70 @@
   function handleToggleAdmin() {
     dispatch('toggleadmin');
   }
+
+  function handleOpenSettings() {
+    dispatch('opensettings');
+  }
 </script>
 
-<style>
-  .sidebar-header {
-    padding: 1.25rem 1rem 0.75rem;
-    border-bottom: 1px solid var(--border-color);
-  }
+<div class="px-4 pt-4 pb-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
 
-  .app-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .brand-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .btn-group {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-  }
-
-  .admin-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.875rem;
-    height: 1.875rem;
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition), border-color var(--transition);
-    font-family: inherit;
-    flex-shrink: 0;
-  }
-
-  .admin-btn:hover {
-    background: var(--brand-primary-light);
-    border-color: rgba(108, 99, 255, 0.4);
-    color: var(--brand-primary);
-  }
-
-  .logout-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.875rem;
-    height: 1.875rem;
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition), border-color var(--transition);
-    font-family: inherit;
-    flex-shrink: 0;
-  }
-
-  .logout-btn:hover {
-    background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.3);
-    color: #dc2626;
-  }
-
-  .app-icon {
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .app-name {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-  }
-
-  .current-user {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    padding: 0.5rem 0.625rem;
-    border-radius: var(--border-radius);
-    background: var(--brand-primary-light);
-    margin-bottom: 0.75rem;
-  }
-
-  .avatar-wrap {
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .online-dot {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 0.625rem;
-    height: 0.625rem;
-    background: var(--color-online);
-    border-radius: 50%;
-    border: 2px solid white;
-  }
-
-  .user-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .user-name {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .user-status {
-    font-size: 0.7rem;
-    color: var(--color-online);
-    font-weight: 500;
-  }
-
-  .search-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .search-icon {
-    position: absolute;
-    left: 0.75rem;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    pointer-events: none;
-  }
-
-  .search-input {
-    width: 100%;
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-full);
-    padding: 0.5rem 0.75rem 0.5rem 2.125rem;
-    font-size: 0.875rem;
-    font-family: inherit;
-    color: var(--text-primary);
-    outline: none;
-    transition: border-color var(--transition), box-shadow var(--transition);
-  }
-
-  .search-input::placeholder {
-    color: var(--text-muted);
-  }
-
-  .search-input:focus {
-    border-color: var(--brand-primary);
-    box-shadow: 0 0 0 3px var(--brand-primary-light);
-  }
-</style>
-
-<div class="sidebar-header">
-  <div class="brand-row">
-    <div class="app-brand">
-      <div class="app-icon">
+  <!-- Brand row -->
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 flex items-center justify-center">
         <img src="/logo.svg" alt="Messenger logo" width="32" height="32" />
       </div>
-      <span class="app-name">Messenger</span>
+      <span class="font-bold text-lg text-slate-900 dark:text-slate-100 tracking-tight">Messenger</span>
     </div>
-    <div class="btn-group">
+    <div class="flex items-center gap-1.5">
       {#if isAdmin}
-        <button class="admin-btn" on:click={handleToggleAdmin} title="Admin panel">
+        <button
+          class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:border-brand-300 dark:hover:border-brand-600 hover:text-brand-600 dark:hover:text-brand-400 transition text-xs font-[inherit]"
+          on:click={handleToggleAdmin}
+          title="Admin panel"
+        >
           <i class="fas fa-users-cog" />
         </button>
       {/if}
-      <button class="logout-btn" on:click={handleLogout} title="Log out">
+      <button
+        class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-300 transition text-xs font-[inherit]"
+        on:click={handleOpenSettings}
+        title="Settings"
+        aria-label="Open settings"
+      >
+        <i class="fas fa-cog" />
+      </button>
+      <button
+        class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 hover:text-red-600 dark:hover:text-red-400 transition text-xs font-[inherit]"
+        on:click={handleLogout}
+        title="Log out"
+      >
         <i class="fas fa-sign-out-alt" />
       </button>
     </div>
   </div>
 
+  <!-- Current user card -->
   {#if user}
-    <div class="current-user">
-      <div class="avatar-wrap">
+    <div class="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-brand-50 dark:bg-brand-900/20 mb-3">
+      <div class="relative shrink-0">
         <Avatar first={user.first} last={user.last} size="md" />
-        <span class="online-dot" />
+        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-800" />
       </div>
-      <div class="user-info">
-        <div class="user-name">{user.first} {user.last}</div>
-        <div class="user-status">Active now</div>
+      <div class="flex-1 min-w-0">
+        <div data-testid="current-user-name" class="font-semibold text-sm text-slate-900 dark:text-slate-100 truncate">{user.first} {user.last}</div>
+        <div class="text-[0.7rem] text-green-500 font-medium">Active now</div>
       </div>
     </div>
   {/if}
 
-  <div class="search-wrap">
-    <i class="fas fa-search search-icon" />
+  <!-- Search -->
+  <div class="relative flex items-center">
+    <i class="fas fa-search absolute left-3 text-slate-400 text-xs pointer-events-none" />
     <input
       type="text"
-      class="search-input"
+      class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-full pl-8 pr-3 py-2 text-sm font-[inherit] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
       placeholder="Search contacts..."
       bind:value={search}
       on:input={handleFilterUsers}

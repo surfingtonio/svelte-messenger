@@ -14,61 +14,22 @@
   }
 </script>
 
-<style>
-  .chat-buddies {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 0.5rem 0.75rem;
-    gap: 0.125rem;
-  }
-
-  .section-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 0.5rem 0.5rem 0.25rem;
-  }
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 2rem 1rem;
-    color: var(--text-muted);
-    text-align: center;
-  }
-
-  .empty-state i {
-    font-size: 2rem;
-    opacity: 0.4;
-  }
-
-  .empty-state p {
-    font-size: 0.875rem;
-    margin: 0;
-  }
-</style>
-
-<div class="chat-buddies">
+<div class="flex flex-col h-full overflow-x-hidden overflow-y-auto px-3 py-2">
   {#if users.length > 0}
-    <div class="section-label">Online — {users.length}</div>
+    <div class="text-[0.7rem] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 px-2 py-1.5">
+      Online — {users.length}
+    </div>
     {#each users as user (user.id)}
       <ChatBuddy
         {user}
         selected={user.id === selectedUserId}
-        on:click={handleClick.bind(this, user)} />
+        on:click={handleClick.bind(this, user)}
+      />
     {/each}
   {:else}
-    <div class="empty-state">
-      <i class="fas fa-user-slash" />
-      <p>No contacts online</p>
+    <div class="flex flex-col items-center justify-center gap-2 py-8 px-4 text-center text-slate-400 dark:text-slate-500">
+      <i class="fas fa-user-slash text-3xl opacity-40" />
+      <p class="text-sm m-0">No contacts online</p>
     </div>
   {/if}
 </div>

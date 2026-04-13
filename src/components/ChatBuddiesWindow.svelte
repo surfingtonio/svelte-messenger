@@ -24,26 +24,18 @@
   $: filteredUsers = filterUsers(users, filterText);
 </script>
 
-<style>
-  .chat-buddies-window {
-    background: var(--bg-sidebar);
-    border-right: 1px solid var(--border-color);
-    display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100vh;
-    overflow: hidden;
-  }
-</style>
-
-<div class="chat-buddies-window">
+<div class="flex flex-col h-full overflow-hidden">
   <ChatBuddiesToolbar
     {user}
     {isAdmin}
     on:filterusers={handleFilterUsers}
     on:logout
-    on:toggleadmin />
+    on:toggleadmin
+    on:opensettings
+  />
   <ChatBuddies
     bind:selectedUserId={selectedBuddyId}
     users={filteredUsers}
-    on:selectbuddy />
+    on:selectbuddy
+  />
 </div>

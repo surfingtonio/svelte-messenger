@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite';
 import { svelte, vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   publicDir: 'public',
-  plugins: [svelte({ preprocess: vitePreprocess() })],
+  plugins: [tailwindcss(), svelte({ preprocess: vitePreprocess() })],
   server: {
     port: 5000,
     strictPort: false,

@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* Tailwind v4: enable .dark class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Custom brand colour tokens — maps to bg-brand-*, text-brand-*, ring-brand-* etc. */
+@theme {
+  --color-brand-50:  oklch(0.96 0.03  277);
+  --color-brand-100: oklch(0.92 0.06  277);
+  --color-brand-200: oklch(0.85 0.11  277);
+  --color-brand-300: oklch(0.75 0.17  277);
+  --color-brand-400: oklch(0.66 0.22  277);
+  --color-brand-500: oklch(0.565 0.252 277);
+  --color-brand-600: oklch(0.495 0.228 276);
+  --color-brand-700: oklch(0.42  0.20  275);
+  --color-brand-800: oklch(0.35  0.17  274);
+  --color-brand-900: oklch(0.28  0.13  273);
+
+  /* Online presence indicator */
+  --color-online: oklch(0.723 0.219 149);
+}
+
+/* Base reset on top of Tailwind's preflight */
+@layer base {
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Thin, subtle scrollbars across the app */
+  ::-webkit-scrollbar        { width: 4px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  { background: oklch(0.87 0.01 258); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: oklch(0.70 0.02 258); }
+  .dark ::-webkit-scrollbar-thumb { background: oklch(0.37 0.014 258); }
+  .dark ::-webkit-scrollbar-thumb:hover { background: oklch(0.50 0.02 258); }
+}

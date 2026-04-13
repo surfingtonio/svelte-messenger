@@ -75,6 +75,7 @@ const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many attempts. Please try again later.' },
+  skip: () => process.env.TEST_MODE === '1',
 });
 
 const distDir = path.join(__dirname, 'dist');
@@ -270,6 +271,28 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req: AdminRequest, res: 
   }
 });
 
+// --- Test-only helpers (only mounted when TEST_MODE=1) ---
+
+if (process.env.TEST_MODE === '1') {
+  // POST /api/test/make-admin — elevates a user to admin role by username.
+  // Intentionally not protected, only available when explicitly running in test mode.
+  app.post('/api/test/make-admin', async (req: Request, res: Response) => {
+    const { username } = req.body as { username?: string };
+    if (!username) return res.status(400).json({ error: 'username required' });
+    try {
+      const [row] = await db
+        .update(usersTable)
+        .set({ roles: JSON.stringify(['user', 'admin']) })
+        .where(eq(usersTable.username, username))
+        .returning();
+      if (!row) return res.status(404).json({ error: 'User not found' });
+      return res.json({ ok: true });
+    } catch {
+      return res.status(500).json({ error: 'Failed to elevate user' });
+    }
+  });
+}
+
 // --- Socket.IO ---
 
 const onlineCount = (): number => _.filter(onlineUsers, { online: true }).length;
@@ -344,6 +367,11 @@ nsp.on('connection', (socket: Socket) => {
   });
 });
 
-httpServer.listen(Number(process.env.PORT) || port, () => {
-  console.log(`Server listening on *:${process.env.PORT || port}`);
-});
+// Start listening only when this file is executed directly (not imported for tests)
+if (!process.env.VITEST) {
+  httpServer.listen(Number(process.env.PORT) || port, () => {
+    console.log(`Server listening on *:${process.env.PORT || port}`);
+  });
+}
+
+export { app, httpServer };

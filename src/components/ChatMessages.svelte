@@ -22,24 +22,10 @@
   });
 </script>
 
-<style>
-  .chat-messages {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 1.25rem 1.5rem;
-    gap: 0.25rem;
-  }
-
-  .chat-messages.disabled {
-    opacity: 0.6;
-    pointer-events: none;
-  }
-</style>
-
-<div class="chat-messages" class:disabled bind:this={chatWindow}>
+<div
+  class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto px-4 py-5 gap-0.5 {disabled ? 'opacity-60 pointer-events-none' : ''}"
+  bind:this={chatWindow}
+>
   {#each chats as chat}
     <ChatMessage {user} {chat} />
   {/each}
