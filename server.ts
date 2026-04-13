@@ -2,6 +2,7 @@ import 'dotenv/config';
 import _ from 'lodash';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import { createServer } from 'http';
 import { Server, type Socket } from 'socket.io';
@@ -66,6 +67,16 @@ const onlineUsers: Record<string, User> = {};
 
 app.use(express.json());
 
+// --- Rate limiting ---
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please try again later.' },
+});
+
 const distDir = path.join(__dirname, 'dist');
 if (fs.existsSync(distDir)) {
   app.use(express.static(distDir));
@@ -75,6 +86,25 @@ app.use(
   '/css/fontawesome',
   express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free'))
 );
+
+// --- Socket.IO auth middleware ---
+
+const socketPayloads = new Map<string, JwtPayload>();
+
+nsp.use((socket, next) => {
+  const token = (socket.handshake.auth as { token?: string })?.token;
+  if (!token) {
+    next(new Error('Unauthorized: no token provided'));
+    return;
+  }
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    socketPayloads.set(socket.id, payload);
+    next();
+  } catch {
+    next(new Error('Unauthorized: invalid or expired token'));
+  }
+});
 
 // --- Middleware ---
 
@@ -103,7 +133,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
-app.post('/api/register', async (req: Request, res: Response) => {
+app.post('/api/register', authLimiter, async (req: Request, res: Response) => {
   const { first, last, username, password } = req.body as {
     first?: string;
     last?: string;
@@ -113,25 +143,38 @@ app.post('/api/register', async (req: Request, res: Response) => {
   if (!first || !last || !username || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
-  const existing = await db
-    .select({ id: usersTable.id })
-    .from(usersTable)
-    .where(eq(usersTable.username, username))
-    .limit(1);
-  if (existing.length) {
-    return res.status(409).json({ error: 'Username is already taken.' });
+  if (first.length > 50 || last.length > 50) {
+    return res.status(400).json({ error: 'Name must be 50 characters or fewer.' });
   }
-  const passwordHash = await bcrypt.hash(password, 10);
-  const [inserted] = await db
-    .insert(usersTable)
-    .values({ first, last, username, passwordHash })
-    .returning();
-  const roles: string[] = JSON.parse(inserted.roles);
-  const token = jwt.sign({ id: inserted.id, roles } satisfies JwtPayload, JWT_SECRET, { expiresIn: '7d' });
-  return res.json({ id: inserted.id, first: inserted.first, last: inserted.last, username: inserted.username, roles, online: false, token });
+  if (username.length > 30) {
+    return res.status(400).json({ error: 'Username must be 30 characters or fewer.' });
+  }
+  if (password.length < 6 || password.length > 72) {
+    return res.status(400).json({ error: 'Password must be between 6 and 72 characters.' });
+  }
+  try {
+    const existing = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.username, username))
+      .limit(1);
+    if (existing.length) {
+      return res.status(409).json({ error: 'Username is already taken.' });
+    }
+    const passwordHash = await bcrypt.hash(password, 10);
+    const [inserted] = await db
+      .insert(usersTable)
+      .values({ first, last, username, passwordHash })
+      .returning();
+    const roles: string[] = JSON.parse(inserted.roles);
+    const token = jwt.sign({ id: inserted.id, roles } satisfies JwtPayload, JWT_SECRET, { expiresIn: '7d' });
+    return res.json({ id: inserted.id, first: inserted.first, last: inserted.last, username: inserted.username, roles, online: false, token });
+  } catch {
+    return res.status(500).json({ error: 'Registration failed. Please try again.' });
+  }
 });
 
-app.post('/api/login', async (req: Request, res: Response) => {
+app.post('/api/login', authLimiter, async (req: Request, res: Response) => {
   const { username, password } = req.body as {
     username?: string;
     password?: string;
@@ -139,65 +182,92 @@ app.post('/api/login', async (req: Request, res: Response) => {
   if (!username || !password) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
-  const [account] = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.username, username))
-    .limit(1);
-  if (!account) {
-    return res.status(401).json({ error: 'Invalid username or password.' });
+  if (password.length > 72) {
+    return res.status(400).json({ error: 'Invalid username or password.' });
   }
-  const valid = await bcrypt.compare(password, account.passwordHash);
-  if (!valid) {
-    return res.status(401).json({ error: 'Invalid username or password.' });
+  try {
+    const [account] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.username, username))
+      .limit(1);
+    if (!account) {
+      return res.status(401).json({ error: 'Invalid username or password.' });
+    }
+    const valid = await bcrypt.compare(password, account.passwordHash);
+    if (!valid) {
+      return res.status(401).json({ error: 'Invalid username or password.' });
+    }
+    const roles: string[] = JSON.parse(account.roles);
+    const token = jwt.sign({ id: account.id, roles } satisfies JwtPayload, JWT_SECRET, { expiresIn: '7d' });
+    return res.json({ id: account.id, first: account.first, last: account.last, username: account.username, roles, online: false, token });
+  } catch {
+    return res.status(500).json({ error: 'Login failed. Please try again.' });
   }
-  const roles: string[] = JSON.parse(account.roles);
-  const token = jwt.sign({ id: account.id, roles } satisfies JwtPayload, JWT_SECRET, { expiresIn: '7d' });
-  return res.json({ id: account.id, first: account.first, last: account.last, username: account.username, roles, online: false, token });
 });
 
 // --- Admin endpoints ---
 
 app.get('/api/admin/users', requireAdmin, async (_req: Request, res: Response) => {
-  const rows = await db
-    .select({
-      id: usersTable.id,
-      first: usersTable.first,
-      last: usersTable.last,
-      username: usersTable.username,
-      roles: usersTable.roles,
-      createdAt: usersTable.createdAt,
-    })
-    .from(usersTable)
-    .orderBy(usersTable.createdAt);
-  return res.json(rows.map((u) => ({ ...u, roles: JSON.parse(u.roles) as string[] })));
+  try {
+    const rows = await db
+      .select({
+        id: usersTable.id,
+        first: usersTable.first,
+        last: usersTable.last,
+        username: usersTable.username,
+        roles: usersTable.roles,
+        createdAt: usersTable.createdAt,
+      })
+      .from(usersTable)
+      .orderBy(usersTable.createdAt);
+    return res.json(rows.map((u) => ({ ...u, roles: JSON.parse(u.roles) as string[] })));
+  } catch {
+    return res.status(500).json({ error: 'Failed to load users.' });
+  }
 });
 
-app.patch('/api/admin/users/:id/roles', requireAdmin, async (req: Request, res: Response) => {
+app.patch('/api/admin/users/:id/roles', requireAdmin, async (req: AdminRequest, res: Response) => {
   const id = Number(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid user id.' });
   const { roles } = req.body as { roles?: string[] };
   if (!Array.isArray(roles)) {
     return res.status(400).json({ error: 'roles must be an array.' });
   }
+  // Validate against allowlist — reject unknown role strings
+  const ALLOWED_ROLES = new Set(['user', 'admin']);
+  const invalid = roles.filter((r) => !ALLOWED_ROLES.has(r));
+  if (invalid.length) {
+    return res.status(400).json({ error: `Invalid role(s): ${invalid.join(', ')}.` });
+  }
   // Always preserve the 'user' role
   const sanitized = Array.from(new Set(['user', ...roles]));
-  const [updated] = await db
-    .update(usersTable)
-    .set({ roles: JSON.stringify(sanitized) })
-    .where(eq(usersTable.id, id))
-    .returning();
-  if (!updated) return res.status(404).json({ error: 'User not found.' });
-  return res.json({ ...updated, roles: JSON.parse(updated.roles) as string[] });
+  try {
+    const [updated] = await db
+      .update(usersTable)
+      .set({ roles: JSON.stringify(sanitized) })
+      .where(eq(usersTable.id, id))
+      .returning();
+    if (!updated) return res.status(404).json({ error: 'User not found.' });
+    return res.json({ ...updated, roles: JSON.parse(updated.roles) as string[] });
+  } catch {
+    return res.status(500).json({ error: 'Failed to update roles.' });
+  }
 });
 
 app.delete('/api/admin/users/:id', requireAdmin, async (req: AdminRequest, res: Response) => {
   const id = Number(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid user id.' });
   const requesterId = req.adminPayload!.id;
   if (id === requesterId) {
     return res.status(400).json({ error: 'You cannot delete your own account.' });
   }
-  await db.delete(usersTable).where(eq(usersTable.id, id));
-  return res.status(204).end();
+  try {
+    await db.delete(usersTable).where(eq(usersTable.id, id));
+    return res.status(204).end();
+  } catch {
+    return res.status(500).json({ error: 'Failed to delete user.' });
+  }
 });
 
 // --- Socket.IO ---
@@ -206,34 +276,71 @@ const onlineCount = (): number => _.filter(onlineUsers, { online: true }).length
 
 nsp.on('connection', (socket: Socket) => {
   socket.on('disconnect', () => {
-    const user = _.find(onlineUsers, (u) => u.socketId === socket.id);
-    if (!user) return;
-    onlineUsers[String(user.id)] = { ...onlineUsers[String(user.id)], online: false };
-    nsp.emit('userleave', { user: onlineUsers[String(user.id)], users: onlineUsers });
-    console.log(`${user.first} ${user.last} left.`);
-    console.log(`There are ${onlineCount()} user(s) in the room.`);
+    try {
+      socketPayloads.delete(socket.id);
+      const user = _.find(onlineUsers, (u) => u.socketId === socket.id);
+      if (!user) return;
+      onlineUsers[String(user.id)] = { ...onlineUsers[String(user.id)], online: false };
+      nsp.emit('userleave', { user: onlineUsers[String(user.id)], users: onlineUsers });
+      console.log(`${user.first} ${user.last} left.`);
+      console.log(`There are ${onlineCount()} user(s) in the room.`);
+    } catch (err) {
+      console.error('Error handling disconnect:', err);
+    }
   });
 
   socket.on('userregister', (user: User) => {
-    onlineUsers[String(user.id)] = { ...user, socketId: socket.id, online: true };
-    socket.emit('userregister', onlineUsers[String(user.id)]);
-    nsp.emit('afteruserregister', { userId: user.id, users: onlineUsers });
-    console.log(`${user.first} ${user.last} joined.`);
-    console.log(`There are ${onlineCount()} user(s) in the room.`);
+    try {
+      const payload = socketPayloads.get(socket.id);
+      if (!payload) { socket.disconnect(); return; }
+      // Enforce JWT-verified identity — client must not be able to spoof id or roles
+      const verified: User = {
+        ...user,
+        id: payload.id,
+        roles: payload.roles,
+        socketId: socket.id,
+        online: true,
+      };
+      onlineUsers[String(payload.id)] = verified;
+      socket.emit('userregister', onlineUsers[String(payload.id)]);
+      nsp.emit('afteruserregister', { userId: payload.id, users: onlineUsers });
+      console.log(`${verified.first} ${verified.last} joined.`);
+      console.log(`There are ${onlineCount()} user(s) in the room.`);
+    } catch (err) {
+      console.error('Error handling userregister:', err);
+    }
   });
 
   socket.on('messagesend', (data: MessageData) => {
-    if (data.receiver?.socketId) {
-      socket.to(data.receiver.socketId).emit('messagereceive', data);
+    try {
+      const payload = socketPayloads.get(socket.id);
+      if (!payload) return;
+      const sender = onlineUsers[String(payload.id)];
+      if (!sender) return;
+      // Enforce server-verified sender identity — client must not be able to impersonate others
+      const verified = { ...data, sender };
+      if (verified.receiver?.socketId) {
+        socket.to(verified.receiver.socketId).emit('messagereceive', verified);
+      }
+    } catch (err) {
+      console.error('Error handling messagesend:', err);
     }
   });
 
   socket.on('keyboardactivity', (data: KeyboardData) => {
-    socket.to(data.socketId).emit('keyboardactivity', data.user);
+    try {
+      socket.to(data.socketId).emit('keyboardactivity', data.user);
+    } catch (err) {
+      console.error('Error handling keyboardactivity:', err);
+    }
   });
 
   socket.on('keyboardactivitystop', (data: KeyboardData) => {
-    socket.to(data.socketId).emit('keyboardactivitystop', data.user);
+    try {
+      socket.to(data.socketId).emit('keyboardactivitystop', data.user);
+    } catch (err) {
+      console.error('Error handling keyboardactivitystop:', err);
+    }
   });
 });
 

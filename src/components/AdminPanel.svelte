@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import Avatar from './Avatar.svelte';
 
   export let selfId: number;
@@ -13,9 +14,20 @@
     createdAt: number;
   }
 
+  const dispatch = createEventDispatcher<{ sessionexpired: void }>();
+
   let users: AdminUser[] = [];
   let loading = true;
   let error = '';
+  let actionError = '';
+
+  async function handleResponse(res: Response): Promise<boolean> {
+    if (res.status === 401) {
+      dispatch('sessionexpired');
+      return false;
+    }
+    return res.ok;
+  }
 
   function formatDate(ts: number): string {
     return new Date(ts * 1000).toLocaleDateString('en-US', {
@@ -28,10 +40,12 @@
   async function loadUsers() {
     loading = true;
     error = '';
+    actionError = '';
     try {
       const res = await fetch('/api/admin/users', {
         headers: { 'Authorization': 'Bearer ' + token },
       });
+      if (res.status === 401) { dispatch('sessionexpired'); return; }
       if (!res.ok) throw new Error('Failed to load users');
       users = await res.json();
     } catch {
@@ -42,27 +56,47 @@
   }
 
   async function toggleAdmin(user: AdminUser) {
+    actionError = '';
     const newRoles = user.roles.includes('admin')
       ? user.roles.filter((r) => r !== 'admin')
       : [...user.roles, 'admin'];
-    const res = await fetch(`/api/admin/users/${user.id}/roles`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token,
-      },
-      body: JSON.stringify({ roles: newRoles }),
-    });
-    if (res.ok) await loadUsers();
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/roles`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        body: JSON.stringify({ roles: newRoles }),
+      });
+      if (await handleResponse(res)) {
+        await loadUsers();
+      } else if (res.status !== 401) {
+        const data = await res.json().catch(() => ({}));
+        actionError = (data as { error?: string }).error ?? 'Failed to update roles.';
+      }
+    } catch {
+      actionError = 'Network error. Please try again.';
+    }
   }
 
   async function deleteUser(user: AdminUser) {
     if (!confirm(`Delete "${user.username}"? This cannot be undone.`)) return;
-    const res = await fetch(`/api/admin/users/${user.id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + token },
-    });
-    if (res.ok) await loadUsers();
+    actionError = '';
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (await handleResponse(res)) {
+        await loadUsers();
+      } else if (res.status !== 401) {
+        const data = await res.json().catch(() => ({}));
+        actionError = (data as { error?: string }).error ?? 'Failed to delete user.';
+      }
+    } catch {
+      actionError = 'Network error. Please try again.';
+    }
   }
 
   loadUsers();
@@ -146,6 +180,32 @@
   .admin-content {
     overflow-y: auto;
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .action-error-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--border-radius);
+    color: #dc2626;
+    font-size: 0.875rem;
+  }
+
+  .dismiss-btn {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #dc2626;
+    font-size: 0.8rem;
+    padding: 0.125rem 0.25rem;
+    font-family: inherit;
   }
 
   .status-msg {
@@ -351,6 +411,15 @@
   </div>
 
   <div class="admin-content">
+    {#if actionError}
+      <div class="action-error-banner">
+        <i class="fas fa-exclamation-triangle" />
+        {actionError}
+        <button class="dismiss-btn" on:click={() => (actionError = '')} aria-label="Dismiss">
+          <i class="fas fa-times" />
+        </button>
+      </div>
+    {/if}
     {#if loading}
       <div class="status-msg">
         <i class="fas fa-spinner fa-spin" />

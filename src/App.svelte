@@ -38,8 +38,8 @@
     entries.forEach((e) => { if (e?.timeoutId) clearTimeout(e.timeoutId); });
   }
 
-  function connect(user: Partial<User>) {
-    socket = io($app.config.namespace);
+  function connect(user: Partial<User>, token: string) {
+    socket = io($app.config.namespace, { auth: { token } });
 
     socket.on('afteruserregister', (event: { users: Record<string, User> }) => {
       $app = _.set($app, 'users', event.users);
@@ -47,7 +47,7 @@
 
     socket.on('keyboardactivity', (u: User) => {
       clearKeyboardTimeout(u.id);
-      const timeoutId = setTimeout(() => clearKeyboardTimeout(u.id), 1000);
+      const timeoutId = setTimeout(() => clearKeyboardTimeout(u.id), $app.config.keyboardActivityTimeOut);
       keyboardActivities = _.set(keyboardActivities, String(u.id), { timeoutId });
     });
 
@@ -66,7 +66,7 @@
     socket.on('messagereceive', (chat: ChatMsg) => {
       selectedBuddyId = selectedBuddyId ?? chat.sender.id;
       $app = appendToStore('chats', chat.sender.id, chat);
-      new Audio('./sounds/pop.mp3').play();
+      new Audio('./sounds/pop.mp3').play().catch(() => {});
     });
 
     socket.emit('userregister', user);
@@ -77,7 +77,7 @@
     authToken = token;
     $app = _.set($app, 'user', user);
     loggedIn = true;
-    connect(user);
+    connect(user, token);
   }
 
   function handleLogout() {
@@ -264,7 +264,7 @@
       on:logout={handleLogout}
       on:toggleadmin={handleToggleAdmin} />
     {#if adminView}
-      <AdminPanel selfId={adminSelfId} token={authToken} />
+      <AdminPanel selfId={adminSelfId} token={authToken} on:sessionexpired={handleLogout} />
     {:else if selectedBuddyId === null}
       <Home bind:usersCount {user} />
     {:else}

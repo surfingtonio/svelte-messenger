@@ -53,6 +53,7 @@ See `.env.example` for all options.
 - `PORT`: backend port (default `4000`)
 - `JWT_SECRET`: JWT signing key (required in production)
 - `ALLOWED_ORIGINS`: comma-separated CORS origins for frontend URLs
+- `DATABASE_URL`: SQLite file path (default `./messenger.db`)
 
 ## Running the App
 

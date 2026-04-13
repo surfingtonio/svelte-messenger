@@ -11,7 +11,9 @@
   let filterText: string = '';
 
   function filterUsers(list: User[], text: string): User[] {
-    const regex = new RegExp(text, 'i');
+    if (!text) return list;
+    const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped, 'i');
     return list.filter((u) => regex.test(`${u.first} ${u.last}`));
   }
 

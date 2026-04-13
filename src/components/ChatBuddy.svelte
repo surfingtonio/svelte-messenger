@@ -16,6 +16,11 @@
     cursor: pointer;
     transition: background var(--transition);
     position: relative;
+    width: 100%;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-family: inherit;
   }
 
   .chat-buddy:hover {
@@ -68,7 +73,7 @@
   }
 </style>
 
-<div class="chat-buddy" class:selected on:click>
+<button class="chat-buddy" class:selected type="button" on:click>
   <div class="avatar-wrap">
     <Avatar first={user.first} last={user.last} size="md" />
     <span class="online-dot" />
@@ -77,4 +82,4 @@
     <div class="fullname">{user.first} {user.last}</div>
     <div class="status">Online</div>
   </div>
-</div>
+</button>

@@ -29,7 +29,7 @@
 
   function handleKeyboardActivity(event: CustomEvent<KeyboardEvent>) {
     const data = { user: sender, socketId: receiver.socketId ?? '' };
-    event.detail.keyCode === 13
+    event.detail.key === 'Enter'
       ? dispatch('keyboardactivitystop', data)
       : dispatch('keyboardactivity', data);
   }

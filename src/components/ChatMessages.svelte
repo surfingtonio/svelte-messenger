@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import ChatMessage from './ChatMessage.svelte';
   import type { User, ChatMsg } from '../types';
 
@@ -8,12 +8,17 @@
   export let disabled: boolean = false;
 
   let chatWindow: HTMLDivElement;
+  let observer: MutationObserver;
 
   onMount(() => {
-    const observer = new MutationObserver(() => {
+    observer = new MutationObserver(() => {
       chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
     });
     observer.observe(chatWindow, { childList: true });
+  });
+
+  onDestroy(() => {
+    observer?.disconnect();
   });
 </script>
 

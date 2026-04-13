@@ -8,7 +8,7 @@
     '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4'
   ];
 
-  function colorFor(name) {
+  function colorFor(name: string) {
     let h = 0;
     for (let i = 0; i < name.length; i++) {
       h = name.charCodeAt(i) + ((h << 5) - h);

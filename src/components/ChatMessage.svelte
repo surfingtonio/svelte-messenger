@@ -1,5 +1,4 @@
 <script lang="ts">
-  import moment from 'moment';
   import Avatar from './Avatar.svelte';
   import type { User, ChatMsg } from '../types';
 
@@ -7,6 +6,10 @@
   export let user: User;
 
   $: isYou = chat.sender.id === user.id;
+
+  function formatTime(time: Date | string): string {
+    return new Date(time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
 </script>
 
 <style>
@@ -103,6 +106,6 @@
     <div class="bubble">
       {chat.message.content}
     </div>
-    <span class="time">{moment(chat.message.time).format('h:mm a')}</span>
+    <span class="time">{formatTime(chat.message.time)}</span>
   </div>
 </div>

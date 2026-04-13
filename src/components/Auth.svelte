@@ -84,16 +84,16 @@
     }
   }
 
-  function switchMode(newMode) {
+  function switchMode(newMode: 'login' | 'signup') {
     mode = newMode;
     error = '';
   }
 
-  function onLoginKeydown(e) {
+  function onLoginKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') handleLogin();
   }
 
-  function onSignupKeydown(e) {
+  function onSignupKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') handleSignup();
   }
 </script>

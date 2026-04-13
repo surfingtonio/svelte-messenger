@@ -24,6 +24,6 @@ export default defineConfig({
     emptyOutDir: true,
   },
   optimizeDeps: {
-    include: ['lodash', 'moment', 'socket.io-client'],
+    include: ['lodash', 'socket.io-client'],
   },
 });

@@ -125,6 +125,7 @@
     {disabled}
     on:click|preventDefault={handleMessageSend}
     title="Send message"
+    aria-label="Send message"
   >
     <i class="fas fa-paper-plane" />
   </button>
