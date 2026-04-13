@@ -17,6 +17,10 @@ public/build/
 # Logs
 *.log
 
+# Test artifacts
+test-results/
+playwright-report/
+
 # Local environment files
 .env
 
