@@ -16,3 +16,11 @@ public/build/
 
 # Logs
 *.log
+
+# Local environment files
+.env
+
+# Local SQLite files
+messenger.db
+*.db-shm
+*.db-wal
