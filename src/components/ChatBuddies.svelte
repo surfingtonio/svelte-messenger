@@ -23,12 +23,12 @@
       <ChatBuddy
         {user}
         selected={user.id === selectedUserId}
-        on:click={handleClick.bind(this, user)}
+        on:click={() => handleClick(user)}
       />
     {/each}
   {:else}
     <div class="flex flex-col items-center justify-center gap-2 py-8 px-4 text-center text-slate-400 dark:text-slate-500">
-      <i class="fas fa-user-slash text-3xl opacity-40" />
+      <i class="fas fa-user-slash text-3xl opacity-40" aria-hidden="true" />
       <p class="text-sm m-0">No contacts online</p>
     </div>
   {/if}

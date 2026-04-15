@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import _ from 'lodash';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
@@ -16,6 +15,11 @@ import { users as usersTable } from './src/db/schema.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const isProduction = process.env.NODE_ENV === 'production';
+if (!process.env.JWT_SECRET && isProduction) {
+  console.error('[FATAL] JWT_SECRET must be set in production. Exiting.');
+  process.exit(1);
+}
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 if (!process.env.JWT_SECRET) {
   console.warn('[WARN] JWT_SECRET is not set — using insecure default. Set it before deploying.');
@@ -295,13 +299,13 @@ if (process.env.TEST_MODE === '1') {
 
 // --- Socket.IO ---
 
-const onlineCount = (): number => _.filter(onlineUsers, { online: true }).length;
+const onlineCount = (): number => Object.values(onlineUsers).filter(u => u.online).length;
 
 nsp.on('connection', (socket: Socket) => {
   socket.on('disconnect', () => {
     try {
       socketPayloads.delete(socket.id);
-      const user = _.find(onlineUsers, (u) => u.socketId === socket.id);
+      const user = Object.values(onlineUsers).find((u) => u.socketId === socket.id);
       if (!user) return;
       onlineUsers[String(user.id)] = { ...onlineUsers[String(user.id)], online: false };
       nsp.emit('userleave', { user: onlineUsers[String(user.id)], users: onlineUsers });
@@ -312,15 +316,29 @@ nsp.on('connection', (socket: Socket) => {
     }
   });
 
-  socket.on('userregister', (user: User) => {
+  socket.on('userregister', async () => {
     try {
       const payload = socketPayloads.get(socket.id);
       if (!payload) { socket.disconnect(); return; }
-      // Enforce JWT-verified identity — client must not be able to spoof id or roles
+      // Fetch authoritative user data from DB — never trust client-supplied display names
+      const [row] = await db
+        .select({
+          id: usersTable.id,
+          first: usersTable.first,
+          last: usersTable.last,
+          username: usersTable.username,
+          roles: usersTable.roles,
+        })
+        .from(usersTable)
+        .where(eq(usersTable.id, payload.id))
+        .limit(1);
+      if (!row) { socket.disconnect(); return; }
       const verified: User = {
-        ...user,
-        id: payload.id,
-        roles: payload.roles,
+        id: row.id,
+        first: row.first,
+        last: row.last,
+        username: row.username,
+        roles: JSON.parse(row.roles) as string[],
         socketId: socket.id,
         online: true,
       };
@@ -340,6 +358,9 @@ nsp.on('connection', (socket: Socket) => {
       if (!payload) return;
       const sender = onlineUsers[String(payload.id)];
       if (!sender) return;
+      // Validate message content
+      const content = (data as { message?: { content?: unknown } }).message?.content;
+      if (typeof content !== 'string' || content.trim().length === 0 || content.length > 2000) return;
       // Enforce server-verified sender identity — client must not be able to impersonate others
       const verified = { ...data, sender };
       if (verified.receiver?.socketId) {
@@ -352,7 +373,12 @@ nsp.on('connection', (socket: Socket) => {
 
   socket.on('keyboardactivity', (data: KeyboardData) => {
     try {
-      socket.to(data.socketId).emit('keyboardactivity', data.user);
+      const payload = socketPayloads.get(socket.id);
+      if (!payload) return;
+      const sender = onlineUsers[String(payload.id)];
+      if (!sender) return;
+      // Use server-verified sender identity, not client-supplied user object
+      socket.to(data.socketId).emit('keyboardactivity', sender);
     } catch (err) {
       console.error('Error handling keyboardactivity:', err);
     }
@@ -360,7 +386,12 @@ nsp.on('connection', (socket: Socket) => {
 
   socket.on('keyboardactivitystop', (data: KeyboardData) => {
     try {
-      socket.to(data.socketId).emit('keyboardactivitystop', data.user);
+      const payload = socketPayloads.get(socket.id);
+      if (!payload) return;
+      const sender = onlineUsers[String(payload.id)];
+      if (!sender) return;
+      // Use server-verified sender identity, not client-supplied user object
+      socket.to(data.socketId).emit('keyboardactivitystop', sender);
     } catch (err) {
       console.error('Error handling keyboardactivitystop:', err);
     }

@@ -24,7 +24,7 @@ export function colorFor(name: string): string {
  * Example: 1_700_000_000 → "Nov 14, 2023"
  */
 export function formatDate(ts: number): string {
-  return new Date(ts * 1000).toLocaleDateString('en-US', {
+  return new Date(ts * 1000).toLocaleDateString(navigator.language, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

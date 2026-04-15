@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import _ from 'lodash';
   import app from './store';
   import { io } from 'socket.io-client';
   import type { Socket } from 'socket.io-client';
@@ -26,15 +25,17 @@
   // Mobile: 'contacts' shows the sidebar, 'chat' shows the main panel
   let mobileView: 'contacts' | 'chat' = 'contacts';
 
+  const notificationSound = new Audio('./sounds/pop.mp3');
+
   function appendToStore(store: 'chats', key: string | number, data: ChatMsg) {
-    const existingData: ChatMsg[] = _.get($app, `${store}.${key}`, []);
-    return _.set($app, `${store}.${key}`, [...existingData, data]);
+    const existingData: ChatMsg[] = $app[store][String(key)] ?? [];
+    return { ...$app, [store]: { ...$app[store], [String(key)]: [...existingData, data] } };
   }
 
   function clearKeyboardTimeout(userId: string | number) {
-    const entry = _.get(keyboardActivities, String(userId), null) as KeyboardActivityEntry | null;
+    const entry = keyboardActivities[String(userId)] ?? null;
     if (entry?.timeoutId) clearTimeout(entry.timeoutId);
-    keyboardActivities = _.set(keyboardActivities, String(userId), null);
+    keyboardActivities = { ...keyboardActivities, [String(userId)]: null };
   }
 
   function clearAllKeyboardTimeouts() {
@@ -46,13 +47,13 @@
     socket = io($app.config.namespace, { auth: { token } });
 
     socket.on('afteruserregister', (event: { users: Record<string, User> }) => {
-      $app = _.set($app, 'users', event.users);
+      $app = { ...$app, users: event.users };
     });
 
     socket.on('keyboardactivity', (u: User) => {
       clearKeyboardTimeout(u.id);
       const timeoutId = setTimeout(() => clearKeyboardTimeout(u.id), $app.config.keyboardActivityTimeOut);
-      keyboardActivities = _.set(keyboardActivities, String(u.id), { timeoutId });
+      keyboardActivities = { ...keyboardActivities, [String(u.id)]: { timeoutId } };
     });
 
     socket.on('keyboardactivitystop', (u: User) => {
@@ -60,26 +61,26 @@
     });
 
     socket.on('userleave', (event: { users: Record<string, User> }) => {
-      $app = _.set($app, 'users', event.users);
+      $app = { ...$app, users: event.users };
     });
 
     socket.on('userregister', (u: User) => {
-      $app = _.set($app, 'user', u);
+      $app = { ...$app, user: u };
     });
 
     socket.on('messagereceive', (chat: ChatMsg) => {
       selectedBuddyId = selectedBuddyId ?? chat.sender.id;
       $app = appendToStore('chats', chat.sender.id, chat);
-      new Audio('./sounds/pop.mp3').play().catch(() => {});
+      notificationSound.play().catch(() => {});
     });
 
-    socket.emit('userregister', user);
+    socket.emit('userregister');
   }
 
   function handleAuth(event: CustomEvent<AuthPayload>) {
     const { token, ...user } = event.detail;
     authToken = token;
-    $app = _.set($app, 'user', user);
+    $app = { ...$app, user };
     loggedIn = true;
     connect(user, token);
   }
@@ -90,9 +91,7 @@
       socket = null;
     }
     clearAllKeyboardTimeouts();
-    $app = _.set($app, 'user', {});
-    $app = _.set($app, 'users', {});
-    $app = _.set($app, 'chats', {});
+    $app = { ...$app, user: {}, users: {}, chats: {} };
     selectedBuddyId = null;
     keyboardActivities = {};
     adminView = false;
@@ -135,20 +134,20 @@
     });
   }
 
-  function handlekeyboardActivityStop(event: CustomEvent<{ user: User; socketId: string }>) {
+  function handleKeyboardActivityStop(event: CustomEvent<{ user: User; socketId: string }>) {
     socket?.emit('keyboardactivitystop', {
       user: event.detail.user,
       socketId: event.detail.socketId,
     });
   }
 
-  $: user = _.get($app, 'user', null) as Partial<User>;
-  $: users = _.get($app, 'users', {}) as Record<string, User>;
-  $: chats = _.get($app, `chats.${selectedBuddyId}`, []) as ChatMsg[];
-  $: receiver = _.get($app, `users.${selectedBuddyId}`, null) as User | null;
-  $: buddies = _.filter(users, (buddy: User) => buddy.online && buddy.id !== (user as User).id);
+  $: user = ($app.user ?? null) as Partial<User>;
+  $: users = ($app.users ?? {}) as Record<string, User>;
+  $: chats = (selectedBuddyId !== null ? $app.chats[String(selectedBuddyId)] : null) ?? [] as ChatMsg[];
+  $: receiver = (selectedBuddyId !== null ? $app.users[String(selectedBuddyId)] ?? null : null) as User | null;
+  $: buddies = Object.values(users).filter((buddy: User) => buddy.online && buddy.id !== (user as User).id);
   $: usersCount = buddies.length;
-  $: keyboardActivity = _.get(keyboardActivities, String(selectedBuddyId), null);
+  $: keyboardActivity = keyboardActivities[String(selectedBuddyId)] ?? null;
   $: isAdmin = (user as User).roles?.includes('admin') ?? false;
   $: adminSelfId = (user as User).id ?? 0;
   $: chatWindowProps = {
@@ -156,7 +155,7 @@
     receiver,
     usersCount,
     chats,
-    keyboardActivity: !_.isNull(keyboardActivity),
+    keyboardActivity: keyboardActivity !== null,
   };
 </script>
 
@@ -197,7 +196,7 @@
           {...chatWindowProps}
           on:messagesend={handleMessageSend}
           on:keyboardactivity={handleKeyboardActivity}
-          on:keyboardactivitystop={handlekeyboardActivityStop}
+          on:keyboardactivitystop={handleKeyboardActivityStop}
           on:back={handleBack}
         />
       {/if}

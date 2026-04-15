@@ -10,6 +10,7 @@ function applyTheme(t: Theme): void {
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isDark = t === 'dark' || (t === 'system' && prefersDark);
   document.documentElement.classList.toggle('dark', isDark);
+  document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
 }
 
 const saved =

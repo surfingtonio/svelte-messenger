@@ -25,6 +25,9 @@
 <div
   class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto px-4 py-5 gap-0.5 {disabled ? 'opacity-60 pointer-events-none' : ''}"
   bind:this={chatWindow}
+  aria-live="polite"
+  aria-label="Chat messages"
+  role="log"
 >
   {#each chats as chat}
     <ChatMessage {user} {chat} />

@@ -17,11 +17,11 @@
       on:click={() => dispatch('back')}
       aria-label="Back to contacts"
     >
-      <i class="fas fa-arrow-left" />
+      <i class="fas fa-arrow-left" aria-hidden="true" />
     </button>
     <div class="relative shrink-0">
       <Avatar first={user.first} last={user.last} size="md" />
-      <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-800" />
+      <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-800" aria-hidden="true" />
     </div>
     <div>
       <div class="font-bold text-[0.9375rem] text-slate-900 dark:text-slate-100 leading-tight">{user.first} {user.last}</div>
@@ -33,7 +33,7 @@
       class="flex items-center gap-1.5 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-semibold px-3 py-1.5 rounded-full"
       title="{usersCount} online {usersCount === 1 ? 'user' : 'users'}"
     >
-      <i class="fas fa-users text-[0.7rem]" />
+      <i class="fas fa-users text-[0.7rem]" aria-hidden="true" />
       {usersCount} online
     </div>
   </div>

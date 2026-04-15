@@ -16,7 +16,7 @@
       on:click={() => dispatch('back')}
       aria-label="Back to contacts"
     >
-      <i class="fas fa-arrow-left" />
+      <i class="fas fa-arrow-left" aria-hidden="true" />
     </button>
     <span class="font-semibold text-slate-900 dark:text-slate-100">Messenger</span>
   </div>
@@ -25,7 +25,7 @@
   <div class="flex-1 flex items-center justify-center p-8">
     <div class="text-center max-w-xs">
       <div class="inline-flex items-center justify-center w-20 h-20 bg-brand-100 dark:bg-brand-900/30 rounded-full mb-6">
-        <i class="fas fa-comment-dots text-brand-500 dark:text-brand-400 text-3xl" />
+        <i class="fas fa-comment-dots text-brand-500 dark:text-brand-400 text-3xl" aria-hidden="true" />
       </div>
       <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mb-2">
         Hey, <span class="text-brand-500">{user.first}!</span>
@@ -36,7 +36,7 @@
           Pick one to start chatting.
         </p>
         <span class="inline-flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 shadow-sm">
-          <i class="fas fa-arrow-left text-brand-500" />
+          <i class="fas fa-arrow-left text-brand-500" aria-hidden="true" />
           Select a contact on the left
         </span>
       {:else}
@@ -45,7 +45,7 @@
           Check back soon!
         </p>
         <span class="inline-flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 shadow-sm">
-          <i class="fas fa-clock text-brand-500" />
+          <i class="fas fa-clock text-brand-500" aria-hidden="true" />
           Waiting for others to join…
         </span>
       {/if}

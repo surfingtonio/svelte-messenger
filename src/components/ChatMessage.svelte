@@ -8,7 +8,11 @@
   $: isYou = chat.sender.id === user.id;
 
   function formatTime(time: Date | string): string {
-    return new Date(time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return new Date(time).toLocaleTimeString(navigator.language, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function isoTime(time: Date | string): string {
+    return new Date(time).toISOString();
   }
 </script>
 
@@ -28,6 +32,6 @@
           ? 'bg-brand-500 text-white rounded-br-[0.25rem]'
           : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-[0.25rem] shadow-sm'}"
     >{chat.message.content}</div>
-    <span class="text-[0.65rem] opacity-60 px-2 text-slate-500 dark:text-slate-400 {isYou ? 'text-right' : ''}">{formatTime(chat.message.time)}</span>
+    <time datetime={isoTime(chat.message.time)} class="text-[0.65rem] opacity-60 px-2 text-slate-500 dark:text-slate-400 {isYou ? 'text-right' : ''}">{formatTime(chat.message.time)}</time>
   </div>
 </div>
