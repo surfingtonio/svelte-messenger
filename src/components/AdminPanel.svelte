@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Avatar from './Avatar.svelte';
+  import Icon from './Icon.svelte';
   import { formatDate } from '../utils';
 
   export let selfId: number;
@@ -102,14 +103,14 @@
     <div class="flex items-center gap-3">
       <!-- Mobile back button -->
       <button
-        class="md:hidden w-8 h-8 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-sm font-[inherit] -ml-1"
+        class="md:hidden w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors -ml-1"
         on:click={() => dispatch('back')}
         aria-label="Back to contacts"
       >
-        <i class="fas fa-arrow-left" />
+        <Icon name="arrow-left" size={16} />
       </button>
-      <div class="w-8 h-8 bg-brand-100 dark:bg-brand-900/30 text-brand-500 dark:text-brand-400 rounded-md flex items-center justify-center text-sm">
-        <i class="fas fa-users-cog" />
+      <div class="w-8 h-8 bg-brand-100 dark:bg-brand-900/30 text-brand-500 dark:text-brand-400 rounded-lg flex items-center justify-center">
+        <Icon name="users-cog" size={16} />
       </div>
       <span class="font-semibold text-[0.9375rem] text-slate-900 dark:text-slate-100">User Management</span>
       {#if !loading}
@@ -119,38 +120,39 @@
       {/if}
     </div>
     <button
-      class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:border-brand-300 dark:hover:border-brand-600 hover:text-brand-500 transition text-xs font-[inherit]"
+      class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:text-brand-500 transition-colors"
       on:click={loadUsers}
-      title="Refresh"
+      title="Refresh users"
+      aria-label="Refresh users"
     >
-      <i class="fas fa-sync" />
+      <Icon name="refresh-cw" size={15} />
     </button>
   </div>
 
   <!-- Content -->
   <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
     {#if actionError}
-      <div class="flex items-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-xl text-red-600 dark:text-red-400 text-sm">
-        <i class="fas fa-exclamation-triangle shrink-0" />
+      <div class="flex items-center gap-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-xl text-red-600 dark:text-red-400 text-sm animate-scale-in">
+        <Icon name="alert-triangle" size={16} className="shrink-0" />
         <span class="flex-1">{actionError}</span>
         <button
-          class="ml-auto text-red-500 hover:text-red-700 text-xs font-[inherit] bg-transparent border-none cursor-pointer"
+          class="ml-auto text-red-500 hover:text-red-700 bg-transparent border-none cursor-pointer"
           on:click={() => (actionError = '')}
           aria-label="Dismiss"
         >
-          <i class="fas fa-times" />
+          <Icon name="x" size={14} />
         </button>
       </div>
     {/if}
 
     {#if loading}
       <div class="flex items-center justify-center h-40 text-slate-400 dark:text-slate-500 text-sm gap-2">
-        <i class="fas fa-spinner fa-spin" />
-        Loading users...
+        <Icon name="loader" size={16} className="animate-spin" />
+        Loading users…
       </div>
     {:else if error}
       <div class="flex items-center justify-center h-40 text-red-500 text-sm gap-2">
-        <i class="fas fa-exclamation-circle" />
+        <Icon name="alert-circle" size={16} />
         {error}
       </div>
     {:else}
@@ -197,27 +199,28 @@
                     {#if user.id !== selfId}
                       {#if user.roles.includes('admin')}
                         <button
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50 hover:bg-red-500 hover:text-white hover:border-red-500 transition whitespace-nowrap font-[inherit] cursor-pointer"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50 hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors whitespace-nowrap cursor-pointer"
                           on:click={() => toggleAdmin(user)}
                         >
-                          <i class="fas fa-shield-alt" />
+                          <Icon name="shield" size={12} />
                           Revoke Admin
                         </button>
                       {:else}
                         <button
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border-brand-200 dark:border-brand-700/50 hover:bg-brand-500 hover:text-white hover:border-brand-500 transition whitespace-nowrap font-[inherit] cursor-pointer"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border-brand-200 dark:border-brand-700/50 hover:bg-brand-500 hover:text-white hover:border-brand-500 transition-colors whitespace-nowrap cursor-pointer"
                           on:click={() => toggleAdmin(user)}
                         >
-                          <i class="fas fa-shield-alt" />
+                          <Icon name="shield" size={12} />
                           Grant Admin
                         </button>
                       {/if}
                       <button
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 hover:text-red-600 dark:hover:text-red-400 transition font-[inherit] cursor-pointer text-xs"
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors cursor-pointer"
                         on:click={() => deleteUser(user)}
-                        title="Delete user"
+                        title="Delete {user.username}"
+                        aria-label="Delete {user.username}"
                       >
-                        <i class="fas fa-trash" />
+                        <Icon name="trash-2" size={14} />
                       </button>
                     {:else}
                       <span class="text-[0.6875rem] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-600">You</span>
@@ -261,9 +264,10 @@
                     >Grant Admin</button>
                   {/if}
                   <button
-                    class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-red-500 transition font-[inherit] cursor-pointer text-xs"
+                    class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
                     on:click={() => deleteUser(user)}
-                  ><i class="fas fa-trash" /></button>
+                    aria-label="Delete {user.username}"
+                  ><Icon name="trash-2" size={14} /></button>
                 {:else}
                   <span class="ml-auto text-[0.6875rem] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 border border-slate-200 dark:border-slate-600">You</span>
                 {/if}

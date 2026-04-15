@@ -9,8 +9,8 @@
 <button
   class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl w-full text-left font-[inherit] transition-colors cursor-pointer
     {selected
-      ? 'bg-brand-50 dark:bg-brand-900/30'
-      : 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700/50'}"
+      ? 'bg-brand-50 dark:bg-brand-900/30 shadow-sm'
+      : 'bg-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'}"
   type="button"
   on:click
 >

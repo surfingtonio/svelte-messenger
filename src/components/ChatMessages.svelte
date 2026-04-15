@@ -23,7 +23,7 @@
 </script>
 
 <div
-  class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto px-4 py-5 gap-0.5 {disabled ? 'opacity-60 pointer-events-none' : ''}"
+  class="flex-1 flex flex-col overflow-x-hidden overflow-y-auto px-4 py-5 gap-0.5 chat-bg {disabled ? 'opacity-60 pointer-events-none' : ''}"
   bind:this={chatWindow}
   aria-live="polite"
   aria-label="Chat messages"

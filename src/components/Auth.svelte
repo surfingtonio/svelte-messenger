@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import Icon from './Icon.svelte';
   import type { AuthPayload } from '../types';
 
   const dispatch = createEventDispatcher<{ auth: AuthPayload }>();
@@ -104,14 +105,14 @@
 </style>
 
 <div class="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950 px-4 py-8">
-  <div class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden">
+  <div class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden animate-scale-in">
 
     <!-- Brand header -->
     <div class="flex items-center justify-center gap-3 pt-8 pb-2 px-8">
       <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center shadow-sm">
-        <i class="fas fa-comment-dots text-white text-base" aria-hidden="true" />
+        <Icon name="message-circle" size={20} className="text-white" />
       </div>
-      <span class="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Messenger</span>
+      <span class="text-xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Messenger</span>
     </div>
 
     <!-- Tabs -->
@@ -170,17 +171,17 @@
             />
           </div>
           {#if error}
-            <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs px-3 py-2.5 rounded-lg" role="alert">
-              <i class="fas fa-exclamation-circle shrink-0" aria-hidden="true" />
+            <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs px-3 py-2.5 rounded-lg animate-scale-in" role="alert">
+              <Icon name="alert-circle" size={14} className="shrink-0" />
               {error}
             </div>
           {/if}
           <button
-            class="w-full py-3 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-semibold rounded-xl transition shadow-[0_2px_8px_theme(colors.brand.500/35%)] hover:shadow-[0_4px_12px_theme(colors.brand.500/45%)] disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+            class="w-full py-3 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-semibold rounded-xl transition-[color,background-color,box-shadow,transform] shadow-[0_2px_8px_theme(colors.brand.500/35%)] hover:shadow-[0_4px_12px_theme(colors.brand.500/45%)] disabled:opacity-60 disabled:cursor-not-allowed text-sm"
             on:click={handleLogin}
             disabled={loading}
           >
-            {#if loading}<i class="fas fa-spinner fa-spin mr-2" aria-hidden="true" />{/if}
+            {#if loading}<Icon name="loader" size={14} className="inline animate-spin mr-2" />{/if}
             {loading ? 'Signing in…' : 'Log In'}
           </button>
         </div>
@@ -261,17 +262,17 @@
             />
           </div>
           {#if error}
-            <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs px-3 py-2.5 rounded-lg" role="alert">
-              <i class="fas fa-exclamation-circle shrink-0" aria-hidden="true" />
+            <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-xs px-3 py-2.5 rounded-lg animate-scale-in" role="alert">
+              <Icon name="alert-circle" size={14} className="shrink-0" />
               {error}
             </div>
           {/if}
           <button
-            class="w-full py-3 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-semibold rounded-xl transition shadow-[0_2px_8px_theme(colors.brand.500/35%)] hover:shadow-[0_4px_12px_theme(colors.brand.500/45%)] disabled:opacity-60 disabled:cursor-not-allowed text-sm"
+            class="w-full py-3 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-semibold rounded-xl transition-[color,background-color,box-shadow,transform] shadow-[0_2px_8px_theme(colors.brand.500/35%)] hover:shadow-[0_4px_12px_theme(colors.brand.500/45%)] disabled:opacity-60 disabled:cursor-not-allowed text-sm"
             on:click={handleSignup}
             disabled={loading}
           >
-            {#if loading}<i class="fas fa-spinner fa-spin mr-2" aria-hidden="true" />{/if}
+            {#if loading}<Icon name="loader" size={14} className="inline animate-spin mr-2" />{/if}
             {loading ? 'Creating account…' : 'Create Account'}
           </button>
         </div>

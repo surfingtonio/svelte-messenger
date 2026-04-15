@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import Avatar from './Avatar.svelte';
+  import Icon from './Icon.svelte';
   import type { User } from '../types';
 
   export let user: User | null = null;
@@ -45,29 +46,29 @@
     <div class="flex items-center gap-1.5">
       {#if isAdmin}
         <button
-          class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:border-brand-300 dark:hover:border-brand-600 hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-xs font-[inherit]"
+          class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
           on:click={handleToggleAdmin}
           title="Admin panel"
           aria-label="Admin panel"
         >
-          <i class="fas fa-users-cog" aria-hidden="true" />
+          <Icon name="users-cog" size={15} />
         </button>
       {/if}
       <button
-        class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-300 transition-colors text-xs font-[inherit]"
+        class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
         on:click={handleOpenSettings}
         title="Settings"
         aria-label="Open settings"
       >
-        <i class="fas fa-cog" aria-hidden="true" />
+        <Icon name="settings" size={15} />
       </button>
       <button
-        class="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-600 text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 hover:text-red-600 dark:hover:text-red-400 transition-colors text-xs font-[inherit]"
+        class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
         on:click={handleLogout}
         title="Log out"
         aria-label="Log out"
       >
-          <i class="fas fa-sign-out-alt" aria-hidden="true" />
+        <Icon name="log-out" size={15} />
       </button>
     </div>
   </div>
@@ -88,10 +89,12 @@
 
   <!-- Search -->
   <div class="relative flex items-center">
-      <i class="fas fa-search absolute left-3 text-slate-400 text-xs pointer-events-none" aria-hidden="true" />
+    <span class="absolute left-3 text-slate-400 pointer-events-none">
+      <Icon name="search" size={14} />
+    </span>
     <input
       type="text"
-      class="w-full bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-full pl-8 pr-3 py-2 text-sm font-[inherit] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-colors"
+      class="w-full bg-slate-100 dark:bg-slate-700/60 border-0 rounded-xl pl-9 pr-3 py-2.5 text-sm font-[inherit] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-brand-500/20 transition-colors"
       placeholder="Search contacts…"
       bind:value={search}
       on:input={handleFilterUsers}

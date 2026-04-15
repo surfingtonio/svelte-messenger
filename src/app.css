@@ -18,6 +18,38 @@
 
   /* Online presence indicator */
   --color-online: oklch(0.723 0.219 149);
+
+  /* Animation tokens */
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-slide-up: slide-up 0.25s ease-out;
+  --animate-slide-right: slide-right 0.2s ease-out;
+  --animate-scale-in: scale-in 0.15s ease-out;
+  --animate-message-in: message-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes message-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* Base reset on top of Tailwind's preflight */
@@ -26,6 +58,7 @@
     height: 100%;
     margin: 0;
     padding: 0;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -37,4 +70,24 @@
   ::-webkit-scrollbar-thumb:hover { background: oklch(0.70 0.02 258); }
   .dark ::-webkit-scrollbar-thumb { background: oklch(0.37 0.014 258); }
   .dark ::-webkit-scrollbar-thumb:hover { background: oklch(0.50 0.02 258); }
+}
+
+/* Subtle chat background pattern */
+@layer utilities {
+  .chat-bg {
+    background-image: radial-gradient(circle at 1px 1px, oklch(0.87 0.01 277 / 0.4) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+  .dark .chat-bg {
+    background-image: radial-gradient(circle at 1px 1px, oklch(0.30 0.02 277 / 0.3) 1px, transparent 0);
+  }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

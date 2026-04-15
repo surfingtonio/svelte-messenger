@@ -16,7 +16,7 @@
   }
 </script>
 
-<div class="flex items-end gap-2 max-w-[70%] mb-0.5 {isYou ? 'self-end flex-row-reverse' : 'self-start'}">
+<div class="flex items-end gap-2 max-w-[70%] mb-0.5 animate-message-in {isYou ? 'self-end flex-row-reverse' : 'self-start'}">
   {#if !isYou}
     <div class="shrink-0 mb-1">
       <Avatar first={chat.sender.first} last={chat.sender.last} size="sm" />

@@ -87,10 +87,6 @@ if (fs.existsSync(distDir)) {
   app.use(express.static(distDir));
 }
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(
-  '/css/fontawesome',
-  express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free'))
-);
 
 // --- Socket.IO auth middleware ---
 
